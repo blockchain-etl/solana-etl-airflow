@@ -15,6 +15,24 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class Token(object):
-    def __init__(self) -> None:
-        self.block_number = None
+
+from typing import Dict
+
+from based58 import b58decode
+from solanaetl.decoder.utils import decode_params, ns64, public_key, u32
+
+
+def decode(data: str) -> Dict[str, object]:
+    data_decoded = b58decode(data.encode())
+    program_func_index, _ = u32(data_decoded)
+    decoding_params = {
+        # Create
+        0: {
+            "instruction": u32,
+            "lamports": ns64,
+            "space": ns64,
+            "program_id": public_key,
+        }
+    }
+
+    return decode_params(data_decoded, decoding_params, program_func_index)
