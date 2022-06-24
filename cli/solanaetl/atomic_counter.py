@@ -14,3 +14,18 @@
 # TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+import itertools
+
+
+# https://stackoverflow.com/a/27062830/1580227
+class AtomicCounter:
+    def __init__(self):
+        self._counter = itertools.count()
+        # init to 0
+        next(self._counter)
+
+    def increment(self, increment=1):
+        assert increment > 0
+        return [next(self._counter) for _ in range(0, increment)][-1]

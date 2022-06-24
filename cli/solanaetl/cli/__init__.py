@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2022 Evgeny Medvedev
+# Copyright (c) 2022 Gamejam.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -16,6 +16,10 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import click
+from solanaetl.cli.export_blocks_and_transactions import \
+    export_blocks_and_transactions
+from solanaetl.cli.export_tokens import export_tokens
+
 
 @click.group()
 @click.version_option(version='0.0.1')
@@ -23,3 +27,6 @@ import click
 def cli(ctx):
     pass
 
+# export
+cli.add_command(export_blocks_and_transactions, "export_blocks_and_transactions")
+cli.add_command(export_tokens, "export_tokens")

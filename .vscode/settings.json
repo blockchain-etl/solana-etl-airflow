@@ -7,7 +7,7 @@
     "fileHeaderComment.parameter": {
         "*": {
             "commentprefix": "#",
-            "author": "Evgeny Medvedev",
+            "author": "Gamejam.com",
             "license_mit": [
                 "The MIT License (MIT)",
                 " Copyright (c) ${year} ${author}",
@@ -27,5 +27,9 @@
                 " TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
             ]
         }
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./cli",
+        "./airflow"
+    ]
 }

@@ -14,3 +14,40 @@
 # TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+from blockchainetl_common.jobs.exporters.composite_item_exporter import \
+    CompositeItemExporter
+
+BLOCK_FIELDS_TO_EXPORT = [
+    'number',
+    'height',
+    'hash',
+    'previous_block_hash',
+    'timestamp',
+    'transaction_count',
+    'reward',
+    'leader',
+]
+
+TRANSACTION_FIELDS_TO_EXPORT = [
+    'signature',
+    'signer',
+    'block_hash',
+    'previous_block_hash',
+    'block_number',
+    'block_timestamp',
+    'fee',
+]
+
+
+def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None):
+    return CompositeItemExporter(
+        filename_mapping={
+            'block': blocks_output,
+            'transaction': transactions_output
+        },
+        field_mapping={
+            'block': BLOCK_FIELDS_TO_EXPORT,
+            'transaction': TRANSACTION_FIELDS_TO_EXPORT
+        }
+    )

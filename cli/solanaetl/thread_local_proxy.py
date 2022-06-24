@@ -14,3 +14,20 @@
 # TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+import threading
+
+
+class ThreadLocalProxy:
+    def __init__(self, delegate_factory):
+        self._thread_local = threading.local()
+        self._delegate_factory = delegate_factory
+
+    def __getattr__(self, name):
+        return getattr(self._get_thread_local_delegate(), name)
+
+    def _get_thread_local_delegate(self):
+        if getattr(self._thread_local, '_delegate', None) is None:
+            self._thread_local._delegate = self._delegate_factory()
+        return self._thread_local._delegate
