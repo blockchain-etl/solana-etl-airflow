@@ -16,6 +16,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import logging
 from solanaetl.domain.block import Block
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 
@@ -36,11 +37,13 @@ class BlockMapper(object):
         block.timestamp = json_dict.get('blockTime')
         block.height = json_dict.get('blockHeight')
 
-        rewards = json_dict.get('rewards')
-        leader = next(reward for reward in rewards
-                      if reward.get('rewardType') == 'Fee')
-        block.reward = leader.get('lamports')
-        block.leader = leader.get('pubkey')
+        if 'rewards' in json_dict:
+            rewards = json_dict.get('rewards')
+            leader = next(reward for reward in rewards
+                          if reward.get('rewardType') == 'Fee') if len(rewards) > 0 else None
+            if leader is not None:
+                block.reward = leader.get('lamports')
+                block.leader = leader.get('pubkey')
 
         if 'transactions' in json_dict:
             block.transactions = [

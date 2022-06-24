@@ -22,17 +22,22 @@ from solanaetl.domain.transaction import Transaction
 
 class TransactionMapper(object):
     def json_dict_to_transaction(self, json_dict, **kwargs):
-        tx_json = json_dict.get('transaction')
-        tx_meta_json = json_dict.get('meta')
         transaction = Transaction()
-        transaction.signature = tx_json.get('signatures')[0]
-        transaction.signer = tx_json.get('message').get('accountKeys')[0]
+
         transaction.block_hash = kwargs.get('block_hash')
-        transaction.previous_block_hash = tx_json.get(
-            'message').get('recentBlockhash')
         transaction.block_number = kwargs.get('block_number')
         transaction.block_timestamp = kwargs.get('block_timestamp')
-        transaction.fee = tx_meta_json.get('fee')
+
+        tx_json = json_dict.get('transaction')
+        if tx_json is not None:
+            transaction.signature = tx_json.get('signatures')[0]
+            transaction.signer = tx_json.get('message').get('accountKeys')[0]
+            transaction.previous_block_hash = tx_json.get(
+                'message').get('recentBlockhash')
+
+        tx_meta_json = json_dict.get('meta')
+        if tx_meta_json is not None:
+            transaction.fee = tx_meta_json.get('fee')
 
         return transaction
 
