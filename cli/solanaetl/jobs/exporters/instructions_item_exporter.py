@@ -17,45 +17,27 @@
 
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.jobs.exporters.accounts_item_exporter import \
-    TX_ACCOUNT_FIELDS_TO_EXPORT
-from solanaetl.jobs.exporters.instructions_item_exporter import \
-    INSTRUCTION_FIELDS_TO_EXPORT
 
-BLOCK_FIELDS_TO_EXPORT = [
-    'number',
-    'height',
-    'hash',
-    'previous_block_hash',
-    'timestamp',
-    'transaction_count',
-    'reward',
-    'leader',
-]
-
-TRANSACTION_FIELDS_TO_EXPORT = [
-    'signature',
-    'block_hash',
-    'previous_block_hash',
-    'block_number',
-    'block_timestamp',
-    'fee',
-    'status',
+INSTRUCTION_FIELDS_TO_EXPORT = [
+    'tx_signature',
+    'index',
+    'parent_index',
+    'accounts',
+    'data',
+    'parsed',
+    'program',
+    'program_id',
+    'instruction_type',
+    'params',
 ]
 
 
-def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None, instructions_output=None, accounts_output=None):
+def instructions_item_exporter(instructions_output=None):
     return CompositeItemExporter(
         filename_mapping={
-            'block': blocks_output,
-            'transaction': transactions_output,
             'instruction': instructions_output,
-            'account': accounts_output,
         },
         field_mapping={
-            'block': BLOCK_FIELDS_TO_EXPORT,
-            'transaction': TRANSACTION_FIELDS_TO_EXPORT,
             'instruction': INSTRUCTION_FIELDS_TO_EXPORT,
-            'account': TX_ACCOUNT_FIELDS_TO_EXPORT,
         }
     )

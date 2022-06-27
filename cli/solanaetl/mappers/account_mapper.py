@@ -15,27 +15,25 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import click
-from solanaetl.cli.export_blocks_and_transactions import \
-    export_blocks_and_transactions
-from solanaetl.cli.export_instructions import export_instructions
-from solanaetl.cli.export_tokens import export_tokens
-from solanaetl.cli.extract_field import extract_field
+from solanaetl.domain.account import Account
 
 
-@click.group()
-@click.version_option(version='0.0.1')
-@click.pass_context
-def cli(ctx):
-    pass
+class AccountMapper(object):
+    def json_dict_to_account(self, json_dict: dict):
+        account = Account()
+        account.pubkey = json_dict.get('pubkey')
+        account.signer = json_dict.get('signer')
+        account.writable = json_dict.get('writable')
 
+        return account
 
-# export
-cli.add_command(export_blocks_and_transactions,
-                "export_blocks_and_transactions")
-cli.add_command(export_tokens, "export_tokens")
-cli.add_command(export_instructions, "export_instructions")
+    def account_to_dict(self, account: Account):
+        return {
+            'type': 'account',
+            'pubkey': account.pubkey,
+            'signer': account.signer,
+            'writable': account.writable,
+        }
 
-
-# utils
-cli.add_command(extract_field, "extract_field")
+    def tx_account_to_dict(self, tx_signature: str, account: Account):
+        return dict(self.account_to_dict(account), **{'tx_signature': tx_signature})

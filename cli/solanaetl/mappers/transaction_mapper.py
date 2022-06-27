@@ -16,30 +16,58 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from solanaetl.domain.block import Block
+import json
+from solanaetl.domain.instruction import Instruction
 from solanaetl.domain.transaction import Transaction
+from solanaetl.mappers.account_mapper import AccountMapper
+from solanaetl.mappers.instruction_mapper import InstructionMapper
 
 
 class TransactionMapper(object):
-    def json_dict_to_transaction(self, json_dict, **kwargs):
+    def __init__(self, instruction_mapper=None, account_mapper=None) -> None:
+        self.instruction_mapper = instruction_mapper if instruction_mapper is not None else InstructionMapper()
+        self.account_mapper = account_mapper if account_mapper is not None else AccountMapper()
+
+    def json_dict_to_transaction(self, json_dict: dict, **kwargs):
         transaction = Transaction()
 
         transaction.block_hash = kwargs.get('block_hash')
         transaction.block_number = kwargs.get('block_number')
         transaction.block_timestamp = kwargs.get('block_timestamp')
 
-        tx_json = json_dict.get('transaction')
+        tx_json: dict = json_dict.get('transaction')
+        instructions: list[Instruction] = []
         if tx_json is not None:
             transaction.signature = tx_json.get('signatures')[0]
-            transaction.signer = tx_json.get('message').get('accountKeys')[0]
+            transaction.accounts = [
+                self.account_mapper.json_dict_to_account(account)
+                for account in tx_json.get('message').get('accountKeys')
+            ]
             transaction.previous_block_hash = tx_json.get(
                 'message').get('recentBlockhash')
 
-        tx_meta_json = json_dict.get('meta')
+            if 'instructions' in tx_json.get('message'):
+                instructions.extend([
+                    self.instruction_mapper.json_dict_to_instruction(
+                        instruction, tx_signature=transaction.signature, index=index)
+                    for index, instruction in enumerate(tx_json.get('message').get('instructions'))
+                ])
+
+        tx_meta_json: dict = json_dict.get('meta')
         if tx_meta_json is not None:
             transaction.fee = tx_meta_json.get('fee')
             tx_err = tx_meta_json.get('err')
             transaction.status = "Success" if tx_err is None else "Fail"
+
+            if 'innerInstructions' in tx_meta_json:
+                instructions.extend([
+                    self.instruction_mapper.json_dict_to_instruction(
+                        instruction, tx_signature=transaction.signature, index=index, parent_index=inner_instruction.get('index'))
+                    for inner_instruction in tx_meta_json.get('innerInstructions')
+                    for index, instruction in enumerate(inner_instruction.get('instructions'))
+                ])
+
+        transaction.instructions = instructions
 
         return transaction
 
@@ -47,11 +75,11 @@ class TransactionMapper(object):
         return {
             'type': 'transaction',
             'signature': transaction.signature,
-            'signer': transaction.signer,
             'block_hash': transaction.block_hash,
             'previous_block_hash': transaction.previous_block_hash,
             'block_number': transaction.block_number,
             'block_timestamp': transaction.block_timestamp,
             'fee': transaction.fee,
             'status': transaction.status,
+            'accounts': json.dumps([self.account_mapper.account_to_dict(account) for account in transaction.accounts]),
         }

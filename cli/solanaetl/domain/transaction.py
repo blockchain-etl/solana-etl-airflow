@@ -15,13 +15,18 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from solanaetl.domain.account import Account
+from solanaetl.domain.instruction import Instruction
+
+
 class Transaction(object):
     def __init__(self) -> None:
         self.signature = None
-        self.signer = None
         self.block_hash = None
         self.previous_block_hash = None
         self.block_number = None
         self.block_timestamp = None
         self.fee = None
         self.status = None
+        self.accounts: list[Account] = None
+        self.instructions: list[Instruction] = None

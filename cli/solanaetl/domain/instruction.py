@@ -15,27 +15,16 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import click
-from solanaetl.cli.export_blocks_and_transactions import \
-    export_blocks_and_transactions
-from solanaetl.cli.export_instructions import export_instructions
-from solanaetl.cli.export_tokens import export_tokens
-from solanaetl.cli.extract_field import extract_field
 
-
-@click.group()
-@click.version_option(version='0.0.1')
-@click.pass_context
-def cli(ctx):
-    pass
-
-
-# export
-cli.add_command(export_blocks_and_transactions,
-                "export_blocks_and_transactions")
-cli.add_command(export_tokens, "export_tokens")
-cli.add_command(export_instructions, "export_instructions")
-
-
-# utils
-cli.add_command(extract_field, "extract_field")
+class Instruction(object):
+    def __init__(self) -> None:
+        self.tx_signature = None
+        self.index = None
+        self.parent_index = None
+        self.accounts = None
+        self.data = None
+        self.program = None
+        self.program_id = None
+        self.parsed = None
+        self.instruction_type = None
+        self.params = None

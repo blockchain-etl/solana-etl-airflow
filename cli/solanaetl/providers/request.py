@@ -21,10 +21,7 @@ import logging
 import lru
 import requests
 from requests.adapters import HTTPAdapter
-
-from web3._utils.caching import (
-    generate_cache_key,
-)
+from web3._utils.caching import generate_cache_key
 
 
 def _remove_session(key, session):
@@ -37,7 +34,7 @@ _session_cache = lru.LRU(8, callback=_remove_session)
 MAX_POOL_SIZE = 40
 
 
-def _get_session(*args, **kwargs):
+def _get_session(*args, **kwargs) -> requests.Session:
     cache_key = generate_cache_key((args, kwargs))
     if cache_key not in _session_cache:
         session = requests.Session()
@@ -54,7 +51,8 @@ def make_post_request(endpoint_uri, data, *args, **kwargs):
     try:
         response.raise_for_status()
     except Exception as e:
-        logging.error('Exception occurred while making a post request, response body was: ' + (response.text or ''))
+        logging.error(
+            'Exception occurred while making a post request, response body was: ' + (response.text or ''))
         raise e
 
     return response.content

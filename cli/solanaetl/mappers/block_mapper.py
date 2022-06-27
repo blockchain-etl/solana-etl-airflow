@@ -16,7 +16,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import logging
 from solanaetl.domain.block import Block
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 
@@ -27,7 +26,6 @@ class BlockMapper(object):
             self.transaction_mapper = TransactionMapper()
         else:
             self.transaction_mapper = transaction_mapper
-        pass
 
     def json_dict_to_block(self, json_dict):
         block = Block()

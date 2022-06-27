@@ -29,10 +29,21 @@ def decode(data: str) -> Dict[str, object]:
     program_func_index, _ = u4(data_decoded)
     decoding_params = {
         # Transfer
+        #
+        # * Single owner/delegate
+        #   0. `[writable]` The source account.
+        #   1. `[writable]` The destination account.
+        #   2. `[signer]` The source account's owner/delegate.
+        #
+        # * Multisignature owner/delegate
+        #   0. `[writable]` The source account.
+        #   1. `[writable]` The destination account.
+        #   2. `[]` The source account's multisignature owner/delegate.
+        #   3. ..3+M `[signer]` M signer accounts.
         3: {
             "instruction": u4,
             "amount": u64,
-        }
+        },
     }
 
     return decode_params(data_decoded, decoding_params, program_func_index)

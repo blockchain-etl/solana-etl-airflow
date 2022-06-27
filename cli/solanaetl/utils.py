@@ -16,6 +16,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import contextlib
+import csv
+import json
+
+from blockchainetl_common.csv_utils import set_max_field_size_limit
+from blockchainetl_common.file_utils import get_file_handle, smart_open
+
 from solanaetl.misc.retriable_value_error import RetriableValueError
 
 
@@ -89,3 +96,25 @@ def is_retriable_error(error_code):
         return True
 
     return False
+
+
+@contextlib.contextmanager
+def get_item_iterable(input_file):
+    fh = get_file_handle(input_file, 'r')
+
+    if input_file.endswith('.csv'):
+        set_max_field_size_limit()
+        reader = csv.DictReader(fh)
+    else:
+        reader = (json.loads(line) for line in fh)
+
+    try:
+        yield reader
+    finally:
+        fh.close()
+
+
+def extract_field(input_file, output_file, field):
+    with get_item_iterable(input_file) as item_iterable, smart_open(output_file, 'w') as output:
+        for item in item_iterable:
+            output.write(item[field] + '\n')

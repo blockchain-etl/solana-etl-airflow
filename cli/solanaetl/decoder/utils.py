@@ -16,6 +16,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import logging
 from typing import Callable, Dict
 
 from based58 import b58encode
@@ -58,11 +59,14 @@ def public_key(data: bytes, offset: int = 0) -> tuple[str, int]:
     return b58encode(public_key_bytes).decode("utf-8"), next_offset
 
 
-def decode_params(data: bytes, decoding_params: Dict[int, Dict[str, Callable]], func_index: int) -> Dict[str, object]:
+def decode_params(data: bytes, decoding_params: Dict[int, Dict[str, Callable[[bytes, int], tuple[bytes, int]]]], func_index: int) -> Dict[str, object]:
     offset = 0
     decoded_params = {}
 
     for property, hanlde_func in decoding_params.get(func_index).items():
         decoded_params[property], offset = hanlde_func(data, offset)
+
+    if offset != len(data):
+        logging.warning(f"Decoded data not fit to original data")
 
     return decoded_params
