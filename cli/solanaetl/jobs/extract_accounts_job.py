@@ -17,6 +17,7 @@
 
 
 import json
+
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
@@ -26,7 +27,7 @@ from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
 from solanaetl.mappers.account_mapper import AccountMapper
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
-from solanaetl.utils import chunk, rpc_response_batch_to_results
+from solanaetl.utils import rpc_response_batch_to_results
 
 
 class ExtractAccountsJob(BaseJob):

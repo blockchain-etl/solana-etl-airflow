@@ -37,3 +37,13 @@ class Account(object):
         self.token_amount_decimals = None
         # if type = program
         self.program_data = None
+        # if type = vote
+        self.authorized_voters = None
+        self.authorized_withdrawer = None
+        self.prior_voters = None
+        self.node_pubkey = None
+        self.commission = None
+        self.epoch_credits = None
+        self.votes = None
+        self.root_slot = None
+        self.last_timestamp = None

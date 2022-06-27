@@ -35,6 +35,15 @@ ACCOUNT_FIELDS_TO_EXPORT = [
     'token_amount',
     'token_amount_decimals',
     'program_data',
+    'authorized_voters',
+    'authorized_withdrawer',
+    'prior_voters',
+    'node_pubkey',
+    'commission',
+    'epoch_credits',
+    'votes',
+    'root_slot',
+    'last_timestamp',
     'data',
 ]
 
