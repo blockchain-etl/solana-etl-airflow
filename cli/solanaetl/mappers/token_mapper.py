@@ -15,6 +15,18 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class Token(object):
-    def __init__(self) -> None:
-        self.block_number = None
+
+from solanaetl.domain.token import Token
+
+
+class TokenMapper(object):
+    def token_to_dict(self, token: Token):
+        return {
+            'type': 'token',
+            # 'address': token.address,
+            # 'symbol': token.symbol,
+            # 'name': token.name,
+            # 'decimals': token.decimals,
+            # 'total_supply': token.total_supply,
+            # 'block_number': token.block_number
+        }

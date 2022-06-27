@@ -38,6 +38,8 @@ class TransactionMapper(object):
         tx_meta_json = json_dict.get('meta')
         if tx_meta_json is not None:
             transaction.fee = tx_meta_json.get('fee')
+            tx_err = tx_meta_json.get('err')
+            transaction.status = "Success" if tx_err is None else "Fail"
 
         return transaction
 
@@ -51,4 +53,5 @@ class TransactionMapper(object):
             'block_number': transaction.block_number,
             'block_timestamp': transaction.block_timestamp,
             'fee': transaction.fee,
+            'status': transaction.status,
         }

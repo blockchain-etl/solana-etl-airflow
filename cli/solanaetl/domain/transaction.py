@@ -24,3 +24,4 @@ class Transaction(object):
         self.block_number = None
         self.block_timestamp = None
         self.fee = None
+        self.status = None

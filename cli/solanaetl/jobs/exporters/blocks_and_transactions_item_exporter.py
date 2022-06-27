@@ -37,6 +37,7 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'block_number',
     'block_timestamp',
     'fee',
+    'status',
 ]
 
 
