@@ -2,7 +2,7 @@
 # Copyright (c) 2022 Gamejam.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-# and associated documentation files (the "Software"), to deal in the Software without restriction,
+# and associated documentation files (the 'Software'), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
 # subject to the following conditions:
@@ -10,7 +10,7 @@
 # The above copyright notice and this permission notice shall be included in all copies or substantial
 # portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+# THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 # TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -21,6 +21,7 @@ from solanaetl.cli.export_blocks_and_transactions import \
 from solanaetl.cli.export_instructions import export_instructions
 from solanaetl.cli.export_tokens import export_tokens
 from solanaetl.cli.extract_field import extract_field
+from solanaetl.cli.extract_token_transfers import extract_token_transfers
 
 
 @click.group()
@@ -32,10 +33,12 @@ def cli(ctx):
 
 # export
 cli.add_command(export_blocks_and_transactions,
-                "export_blocks_and_transactions")
-cli.add_command(export_tokens, "export_tokens")
-cli.add_command(export_instructions, "export_instructions")
+                'export_blocks_and_transactions')
+cli.add_command(export_tokens, 'export_tokens')
+cli.add_command(export_instructions, 'export_instructions')
 
+# extract
+cli.add_command(extract_token_transfers, 'extract_token_transfers')
 
 # utils
-cli.add_command(extract_field, "extract_field")
+cli.add_command(extract_field, 'extract_field')

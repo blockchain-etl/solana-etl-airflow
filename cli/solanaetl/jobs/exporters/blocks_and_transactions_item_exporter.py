@@ -17,8 +17,6 @@
 
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.jobs.exporters.accounts_item_exporter import \
-    TX_ACCOUNT_FIELDS_TO_EXPORT
 from solanaetl.jobs.exporters.instructions_item_exporter import \
     INSTRUCTION_FIELDS_TO_EXPORT
 
@@ -41,21 +39,20 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'block_timestamp',
     'fee',
     'status',
+    'accounts',
 ]
 
 
-def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None, instructions_output=None, accounts_output=None):
+def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None, instructions_output=None):
     return CompositeItemExporter(
         filename_mapping={
             'block': blocks_output,
             'transaction': transactions_output,
             'instruction': instructions_output,
-            'account': accounts_output,
         },
         field_mapping={
             'block': BLOCK_FIELDS_TO_EXPORT,
             'transaction': TRANSACTION_FIELDS_TO_EXPORT,
             'instruction': INSTRUCTION_FIELDS_TO_EXPORT,
-            'account': TX_ACCOUNT_FIELDS_TO_EXPORT,
         }
     )

@@ -10,12 +10,34 @@ Install Solana ETL CLI:
 python setup.py install
 ```
 
-Export blocks and transactions:
+Export blocks and transactions (include input accounts, instructions):
 
 ```bash
 > solanaetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
     --provider-uri https://api.mainnet-beta.solana.com \
-    --blocks-output blocks.csv --transactions-output transactions.csv
+    --blocks-output blocks.csv \
+    --transactions-output transactions.csv \
+    --instructions-output instructions.csv
 ```
 
 ---
+
+Export instructions:
+
+```bash
+> solanaetl extract_field -i transactions.csv -o transaction_signatures.txt -f signature
+> solanaetl export_instructions \
+    --provider-uri https://api.mainnet-beta.solana.com \
+    -t ./transaction_signatures.txt \
+    -o instructions.csv
+```
+
+---
+
+Extract token transfer:
+
+```bash
+> solanaetl extract_token_transfers \
+    -i ./instructions.csv \
+    -o token_transfers.csv
+```

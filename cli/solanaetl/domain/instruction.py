@@ -21,10 +21,10 @@ class Instruction(object):
         self.tx_signature = None
         self.index = None
         self.parent_index = None
-        self.accounts = None
+        self.accounts: list[str] = []
         self.data = None
         self.program = None
         self.program_id = None
         self.parsed = None
         self.instruction_type = None
-        self.params = None
+        self.params: dict[str, object] = {}

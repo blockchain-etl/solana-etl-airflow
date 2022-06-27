@@ -44,8 +44,7 @@ class ExportBlocksJob(BaseJob):
                  item_exporter: CompositeItemExporter,
                  export_blocks=True,
                  export_transactions=True,
-                 export_instructions=True,
-                 export_accounts=True) -> None:
+                 export_instructions=True) -> None:
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -58,16 +57,14 @@ class ExportBlocksJob(BaseJob):
         self.export_blocks = export_blocks
         self.export_transactions = export_transactions
         self.export_instructions = export_instructions
-        self.export_accounts = export_accounts
 
         if not self.export_blocks and not self.export_transactions:
             raise ValueError(
                 'At least one of export_blocks or export_transactions must be True')
 
-        if not self.export_transactions:
-            if self.export_instructions or self.export_accounts:
-                raise ValueError(
-                    'export_transactions must be True')
+        if not self.export_transactions and self.export_instructions:
+            raise ValueError(
+                'export_transactions must be True')
 
         self.block_mapper = BlockMapper()
         self.transaction_mapper = TransactionMapper()
@@ -109,12 +106,6 @@ class ExportBlocksJob(BaseJob):
     def _export_transaction(self, transaction: Transaction):
         self.item_exporter.export_item(
             self.transaction_mapper.transaction_to_dict(transaction))
-
-        # accounts
-        if self.export_accounts:
-            for account in transaction.accounts:
-                self.item_exporter.export_item(
-                    self.account_mapper.tx_account_to_dict(tx_signature=transaction.signature, account=account))
 
         # instructions
         if self.export_instructions:

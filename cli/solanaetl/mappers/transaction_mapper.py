@@ -39,10 +39,7 @@ class TransactionMapper(object):
         instructions: list[Instruction] = []
         if tx_json is not None:
             transaction.signature = tx_json.get('signatures')[0]
-            transaction.accounts = [
-                self.account_mapper.json_dict_to_account(account)
-                for account in tx_json.get('message').get('accountKeys')
-            ]
+            transaction.accounts = tx_json.get('message').get('accountKeys')
             transaction.previous_block_hash = tx_json.get(
                 'message').get('recentBlockhash')
 
@@ -81,5 +78,5 @@ class TransactionMapper(object):
             'block_timestamp': transaction.block_timestamp,
             'fee': transaction.fee,
             'status': transaction.status,
-            'accounts': json.dumps([self.account_mapper.account_to_dict(account) for account in transaction.accounts]),
+            'accounts': json.dumps(transaction.accounts),
         }

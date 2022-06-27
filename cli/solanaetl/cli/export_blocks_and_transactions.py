@@ -42,20 +42,16 @@ logging_basic_config()
 @click.option('--instructions-output', default=None, show_default=True, type=str,
               help='The output file for instructions. '
                    'If not provided instructions will not be exported. Use "-" for stdout')
-@click.option('--accounts-output', default=None, show_default=True, type=str,
-              help='The output file for accounts. '
-                   'If not provided accounts will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='solana', show_default=True, type=str, help='The chain network to connect to.')
 def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output,
-                                   transactions_output, instructions_output, accounts_output, chain='solana'):
+                                   transactions_output, instructions_output, chain='solana'):
     """Exports blocks and transactions."""
     if blocks_output is None and transactions_output is None:
         raise ValueError(
             'Either --blocks-output or --transactions-output options must be provided')
 
-    if transactions_output is None:
-        if instructions_output is not None or accounts_output is not None:
-            raise ValueError('--transactions-output options must be provided')
+    if transactions_output is None and instructions_output is not None:
+        raise ValueError('--transactions-output options must be provided')
 
     job = ExportBlocksJob(
         start_block=start_block,
@@ -65,10 +61,9 @@ def export_blocks_and_transactions(start_block, end_block, batch_size, provider_
             lambda: get_provider_from_uri(provider_uri, batch=True)),
         max_workers=max_workers,
         item_exporter=blocks_and_transactions_item_exporter(
-            blocks_output, transactions_output, instructions_output, accounts_output),
+            blocks_output, transactions_output, instructions_output),
         export_blocks=blocks_output is not None,
         export_transactions=transactions_output is not None,
-        export_instructions=instructions_output is not None,
-        export_accounts=accounts_output is not None)
+        export_instructions=instructions_output is not None)
 
     job.run()
