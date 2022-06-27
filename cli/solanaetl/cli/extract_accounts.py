@@ -20,36 +20,36 @@ import json
 
 import click
 from blockchainetl_common.file_utils import smart_open
-from solanaetl.jobs.exporters.token_transfers_item_exporter import \
-    token_transfers_item_exporter
-from solanaetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
+from solanaetl.jobs.exporters.accounts_item_exporter import \
+    accounts_item_exporter
+from solanaetl.jobs.extract_accounts_job import ExtractAccountsJob
 from solanaetl.providers.auto import get_provider_from_uri
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-i', '--instructions', type=str, required=True, help='The CSV file containing transaction instructions.')
+@click.option('-t', '--transactions', type=str, required=True, help='The CSV file containing transactions.')
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'https://api.mainnet-beta.solana.com')
-def extract_token_transfers(instructions, batch_size, output, max_workers, provider_uri):
-    """Extracts Token transfers from instructions file."""
-    with smart_open(instructions, 'r') as instructions_file:
-        if instructions.endswith('.json'):
-            instructions_reader = (json.loads(line)
-                                   for line in instructions_file)
+def extract_accounts(transactions, batch_size, output, max_workers, provider_uri):
+    """Extracts Accounts from transactions file."""
+    with smart_open(transactions, 'r') as transactions_file:
+        if transactions.endswith('.json'):
+            transactions_reader = (json.loads(line)
+                                   for line in transactions_file)
         else:
-            instructions_reader = csv.DictReader(instructions_file)
+            transactions_reader = csv.DictReader(transactions_file)
 
-        job = ExtractTokenTransfersJob(
+        job = ExtractAccountsJob(
             batch_web3_provider=ThreadLocalProxy(
                 lambda: get_provider_from_uri(provider_uri, batch=True)),
-            instructions_iterable=instructions_reader,
+            transactions_iterable=transactions_reader,
             batch_size=batch_size,
             max_workers=max_workers,
-            item_exporter=token_transfers_item_exporter(output))
+            item_exporter=accounts_item_exporter(output))
 
         job.run()

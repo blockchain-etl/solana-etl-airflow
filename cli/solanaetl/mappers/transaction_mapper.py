@@ -80,3 +80,17 @@ class TransactionMapper(object):
             'status': transaction.status,
             'accounts': json.dumps(transaction.accounts),
         }
+
+    def dict_to_transaction(self, dict: dict):
+        transaction = Transaction()
+
+        transaction.signature = dict.get('signature')
+        transaction.block_hash = dict.get('block_hash')
+        transaction.previous_block_hash = dict.get('previous_block_hash')
+        transaction.block_number = dict.get('block_number')
+        transaction.block_timestamp = dict.get('block_timestamp')
+        transaction.fee = dict.get('fee')
+        transaction.status = dict.get('status')
+        transaction.accounts = json.loads(dict.get('accounts'))
+
+        return transaction

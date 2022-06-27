@@ -41,3 +41,14 @@ Extract token transfer:
     -i ./instructions.csv \
     -o token_transfers.csv
 ```
+
+---
+
+Export accounts:
+
+```bash
+> solanaetl extract_accounts \
+    --provider-uri https://api.mainnet-beta.solana.com \
+    -t ./transactions.csv \
+    -o accounts.csv
+```

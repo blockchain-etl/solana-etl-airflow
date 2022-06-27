@@ -21,12 +21,21 @@ from blockchainetl_common.jobs.exporters.composite_item_exporter import \
 
 ACCOUNT_FIELDS_TO_EXPORT = [
     'pubkey',
-    'signer',
-    'writable'
-]
-
-TX_ACCOUNT_FIELDS_TO_EXPORT = ACCOUNT_FIELDS_TO_EXPORT + [
-    'tx_signature'
+    'executable',
+    'lamports',
+    'owner',
+    'rent_epoch',
+    'program',
+    'space',
+    'account_type',
+    'is_native',
+    'mint',
+    'owner',
+    'state',
+    'token_amount',
+    'token_amount_decimals',
+    'program_data',
+    'data',
 ]
 
 

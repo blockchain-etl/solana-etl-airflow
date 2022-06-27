@@ -15,15 +15,42 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import json
 from solanaetl.domain.account import Account
 
 
 class AccountMapper(object):
-    def json_dict_to_account(self, json_dict: dict):
+    def json_dict_to_account(self, json_dict: dict, accountKey: str = None):
         account = Account()
-        account.pubkey = json_dict.get('pubkey')
-        account.signer = json_dict.get('signer')
-        account.writable = json_dict.get('writable')
+        account.pubkey = accountKey
+        account.executable = json_dict.get('executable')
+        account.lamports = json_dict.get('lamports')
+        account.owner = json_dict.get('owner')
+        account.rent_epoch = json_dict.get('rentEpoch')
+        account.data = json.dumps(json_dict.get('data'))
+
+        data = json_dict.get('data')
+        if isinstance(data, dict):
+            account.space = data.get('space')
+            account.program = data.get('program')
+            if 'parsed' in data:
+                parsed_data: dict = data.get('parsed')
+                account.account_type = parsed_data.get('type')
+                account_info: dict = parsed_data.get('info')
+                if account_info is not None:
+                    if account.account_type == 'program':
+                        account.program_data = account_info.get('programData')
+                    elif account.account_type == 'account':
+                        account.is_native = account_info.get('isNative')
+                        account.mint = account_info.get('mint')
+                        account.owner = account_info.get('owner')
+                        account.state = account_info.get('state')
+
+                        token_amount: dict = account_info.get('tokenAmount')
+                        if token_amount is not None:
+                            account.token_amount = token_amount.get('amount')
+                            account.token_amount_decimals = token_amount.get(
+                                'decimals')
 
         return account
 
@@ -31,9 +58,19 @@ class AccountMapper(object):
         return {
             'type': 'account',
             'pubkey': account.pubkey,
-            'signer': account.signer,
-            'writable': account.writable,
+            'executable': account.executable,
+            'lamports': account.lamports,
+            'owner': account.owner,
+            'rent_epoch': account.rent_epoch,
+            'program': account.program,
+            'space': account.space,
+            'account_type': account.account_type,
+            'is_native': account.is_native,
+            'mint': account.mint,
+            'owner': account.owner,
+            'state': account.state,
+            'token_amount': account.token_amount,
+            'token_amount_decimals': account.token_amount_decimals,
+            'program_data': account.program_data,
+            'data': account.data,
         }
-
-    def tx_account_to_dict(self, tx_signature: str, account: Account):
-        return dict(self.account_to_dict(account), **{'tx_signature': tx_signature})
