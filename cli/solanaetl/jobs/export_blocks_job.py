@@ -16,15 +16,19 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
+from time import sleep
 from typing import List
 
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
 from solanaetl.domain.block import Block
+from solanaetl.domain.transaction import Transaction
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_block_by_number_json_rpc
+from solanaetl.mappers.account_mapper import AccountMapper
 from solanaetl.mappers.block_mapper import BlockMapper
+from solanaetl.mappers.instruction_mapper import InstructionMapper
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
 from solanaetl.utils import rpc_response_batch_to_results, validate_range
@@ -39,7 +43,9 @@ class ExportBlocksJob(BaseJob):
                  max_workers,
                  item_exporter: CompositeItemExporter,
                  export_blocks=True,
-                 export_transactions=True) -> None:
+                 export_transactions=True,
+                 export_instructions=True,
+                 export_accounts=True) -> None:
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -51,12 +57,22 @@ class ExportBlocksJob(BaseJob):
 
         self.export_blocks = export_blocks
         self.export_transactions = export_transactions
+        self.export_instructions = export_instructions
+        self.export_accounts = export_accounts
+
         if not self.export_blocks and not self.export_transactions:
             raise ValueError(
                 'At least one of export_blocks or export_transactions must be True')
 
+        if not self.export_transactions:
+            if self.export_instructions or self.export_accounts:
+                raise ValueError(
+                    'export_transactions must be True')
+
         self.block_mapper = BlockMapper()
         self.transaction_mapper = TransactionMapper()
+        self.instruction_mapper = InstructionMapper()
+        self.account_mapper = AccountMapper()
 
     def _start(self):
         self.item_exporter.open()
@@ -84,10 +100,27 @@ class ExportBlocksJob(BaseJob):
         if self.export_blocks:
             self.item_exporter.export_item(
                 self.block_mapper.block_to_dict(block))
+
+        # transactions
         if self.export_transactions:
-            for tx in block.transactions:
+            for transaction in block.transactions:
+                self._export_transaction(transaction)
+
+    def _export_transaction(self, transaction: Transaction):
+        self.item_exporter.export_item(
+            self.transaction_mapper.transaction_to_dict(transaction))
+
+        # accounts
+        if self.export_accounts:
+            for account in transaction.accounts:
                 self.item_exporter.export_item(
-                    self.transaction_mapper.transaction_to_dict(tx))
+                    self.account_mapper.tx_account_to_dict(tx_signature=transaction.signature, account=account))
+
+        # instructions
+        if self.export_instructions:
+            for instruction in transaction.instructions:
+                self.item_exporter.export_item(
+                    self.instruction_mapper.instruction_to_dict(instruction))
 
     def _end(self):
         self.batch_work_executor.shutdown()

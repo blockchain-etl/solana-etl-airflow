@@ -1,0 +1,55 @@
+# The MIT License (MIT)
+# Copyright (c) 2022 Gamejam.com
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+# and associated documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial
+# portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+# TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+from solanaetl.domain.instruction import Instruction
+
+
+class InstructionMapper(object):
+    def json_dict_to_instruction(self, json_dict: dict, tx_signature: str, index: int, parent_index: int = None):
+        instruction = Instruction()
+        instruction.tx_signature = tx_signature
+        instruction.index = index
+        instruction.parent_index = parent_index
+        instruction.accounts = json_dict.get('accounts')
+        instruction.data = json_dict.get('data')
+        instruction.program = json_dict.get('program')
+        instruction.program_id = json_dict.get('programId')
+
+        if 'parsed' in json_dict:
+            parsed = json_dict.get('parsed')
+            if isinstance(parsed, dict):
+                instruction.instruction_type = parsed.get('type')
+                instruction.params = parsed.get('info')
+            else:
+                instruction.parsed = parsed
+
+        return instruction
+
+    def instruction_to_dict(self, instruction: Instruction):
+        return {
+            'type': 'instruction',
+            'tx_signature': instruction.tx_signature,
+            'index': instruction.index,
+            'parent_index': instruction.parent_index,
+            'accounts': instruction.accounts,
+            'data': instruction.data,
+            'program': instruction.program,
+            'program_id': instruction.program_id,
+            'instruction_type': instruction.instruction_type,
+            'params': instruction.params,
+        }

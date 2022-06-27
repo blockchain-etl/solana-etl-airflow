@@ -16,12 +16,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-def generate_get_block_by_number_json_rpc(block_numbers, include_transactions: bool):
+def generate_get_block_by_number_json_rpc(block_numbers, include_transactions: bool, encoding='jsonParsed'):
     for idx, block_number in enumerate(block_numbers):
         yield generate_json_rpc(
             method='getBlock',
             params=[block_number, {
-                'encoding': 'json',
+                'encoding': encoding,
                 'transactionDetails': 'full' if include_transactions else 'none',
                 'rewards': True
             }],
@@ -29,34 +29,13 @@ def generate_get_block_by_number_json_rpc(block_numbers, include_transactions: b
         )
 
 
-# def generate_trace_block_by_number_json_rpc(block_numbers, timeout='600s'):
-#     for block_number in block_numbers:
-#         yield generate_json_rpc(
-#             method='debug_traceBlockByNumber',
-#             params=[hex(block_number), {
-#                 'tracer': 'callTracer', 'timeout': timeout}],
-#             # save block_number in request ID, so later we can identify block number in response
-#             request_id=block_number,
-#         )
-
-
-# def generate_get_receipt_json_rpc(transaction_hashes):
-#     for idx, transaction_hash in enumerate(transaction_hashes):
-#         yield generate_json_rpc(
-#             method='eth_getTransactionReceipt',
-#             params=[transaction_hash],
-#             request_id=idx
-#         )
-
-
-# def generate_get_code_json_rpc(contract_addresses, block='latest'):
-#     for idx, contract_address in enumerate(contract_addresses):
-#         yield generate_json_rpc(
-#             method='eth_getCode',
-#             params=[contract_address, hex(
-#                 block) if isinstance(block, int) else block],
-#             request_id=idx
-#         )
+def generate_get_transaction_json_rpc(tranaction_signatures, encoding='jsonParsed'):
+    for idx, tranaction_signature in enumerate(tranaction_signatures):
+        yield generate_json_rpc(
+            method='getTransaction',
+            params=[tranaction_signature, encoding],
+            request_id=idx
+        )
 
 
 def generate_json_rpc(method, params, request_id=1):

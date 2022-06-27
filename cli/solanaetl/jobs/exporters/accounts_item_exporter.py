@@ -15,47 +15,27 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.jobs.exporters.accounts_item_exporter import \
-    TX_ACCOUNT_FIELDS_TO_EXPORT
-from solanaetl.jobs.exporters.instructions_item_exporter import \
-    INSTRUCTION_FIELDS_TO_EXPORT
 
-BLOCK_FIELDS_TO_EXPORT = [
-    'number',
-    'height',
-    'hash',
-    'previous_block_hash',
-    'timestamp',
-    'transaction_count',
-    'reward',
-    'leader',
+ACCOUNT_FIELDS_TO_EXPORT = [
+    'pubkey',
+    'signer',
+    'writable'
 ]
 
-TRANSACTION_FIELDS_TO_EXPORT = [
-    'signature',
-    'block_hash',
-    'previous_block_hash',
-    'block_number',
-    'block_timestamp',
-    'fee',
-    'status',
+TX_ACCOUNT_FIELDS_TO_EXPORT = ACCOUNT_FIELDS_TO_EXPORT + [
+    'tx_signature'
 ]
 
 
-def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None, instructions_output=None, accounts_output=None):
+def accounts_item_exporter(accounts_output=None):
     return CompositeItemExporter(
         filename_mapping={
-            'block': blocks_output,
-            'transaction': transactions_output,
-            'instruction': instructions_output,
             'account': accounts_output,
         },
         field_mapping={
-            'block': BLOCK_FIELDS_TO_EXPORT,
-            'transaction': TRANSACTION_FIELDS_TO_EXPORT,
-            'instruction': INSTRUCTION_FIELDS_TO_EXPORT,
-            'account': TX_ACCOUNT_FIELDS_TO_EXPORT,
+            'account': ACCOUNT_FIELDS_TO_EXPORT,
         }
     )

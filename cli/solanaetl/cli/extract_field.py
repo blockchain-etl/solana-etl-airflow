@@ -15,27 +15,15 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 import click
-from solanaetl.cli.export_blocks_and_transactions import \
-    export_blocks_and_transactions
-from solanaetl.cli.export_instructions import export_instructions
-from solanaetl.cli.export_tokens import export_tokens
-from solanaetl.cli.extract_field import extract_field
+from solanaetl import utils
 
 
-@click.group()
-@click.version_option(version='0.0.1')
-@click.pass_context
-def cli(ctx):
-    pass
-
-
-# export
-cli.add_command(export_blocks_and_transactions,
-                "export_blocks_and_transactions")
-cli.add_command(export_tokens, "export_tokens")
-cli.add_command(export_instructions, "export_instructions")
-
-
-# utils
-cli.add_command(extract_field, "extract_field")
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-i', '--input', default='-', show_default=True, type=str, help='The input file. If not specified stdin is used.')
+@click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
+@click.option('-f', '--field', required=True, type=str, help='The field name to extract.')
+def extract_field(input, output, field):
+    """Extracts field from given CSV or JSON newline-delimited file."""
+    utils.extract_field(input, output, field)
