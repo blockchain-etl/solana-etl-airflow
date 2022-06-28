@@ -36,23 +36,13 @@ def read_resource(resource_group, file_name):
 @pytest.mark.parametrize(
     "start_block,end_block,batch_size,resource_group,web3_provider_type",
     [
-        (138802069, 138802069, 1, "block_only", "mock"),
-        # (9013760, 9013761, 1, "blocks_with_transactions", "mock"),
-        # (9013760, 9013761, 2, "blocks_with_transactions", "mock"),
-        # (0, 0, 1, "block_without_transactions", "mock"),
-        # skip_if_slow_tests_disabled(
-        #     (13572468, 13572468, 1, "block_with_logs", "online")
-        # ),
-        # skip_if_slow_tests_disabled(
-        #     (9013760, 9013761, 1, "blocks_with_transactions", "online")
-        # ),
-        # skip_if_slow_tests_disabled(
-        #     (9013760, 9013761, 2, "blocks_with_transactions", "online")
-        # ),
-        # skip_if_slow_tests_disabled((0, 0, 1, "block_without_transactions", "online")),
+        (138802069, 138802069, 1, "blocks_only", "mock"),
+        skip_if_slow_tests_disabled(
+            (138802069, 138802069, 1, "blocks_only", "online"),
+        )
     ],
 )
-def test_export_blocks_job(
+def test_export_blocks_job_blocks_only(
     tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type
 ):
     blocks_output_file = str(tmpdir.join("actual_blocks.csv"))
@@ -70,7 +60,7 @@ def test_export_blocks_job(
         ),
         max_workers=5,
         item_exporter=blocks_and_transactions_item_exporter(
-            blocks_output=blocks_output_file
+            blocks_output=blocks_output_file,
         ),
         cluster='mainnet',
         export_blocks=blocks_output_file is not None,
@@ -82,4 +72,110 @@ def test_export_blocks_job(
     compare_lines_ignore_order(
         read_resource(resource_group, "expected_blocks.csv"),
         read_file(blocks_output_file),
+    )
+
+
+@pytest.mark.parametrize(
+    "start_block,end_block,batch_size,resource_group,web3_provider_type",
+    [
+        (138802069, 138802069, 1, "blocks_with_transactions", "mock"),
+        skip_if_slow_tests_disabled(
+            (138802069, 138802069, 1, "blocks_with_transactions", "online"),
+        )
+    ],
+)
+def test_export_blocks_job_with_transactions(
+    tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type
+):
+    blocks_output_file = str(tmpdir.join("actual_blocks.csv"))
+    transactions_output_file = str(tmpdir.join("actual_transactions.csv"))
+
+    job = ExportBlocksJob(
+        start_block=start_block,
+        end_block=end_block,
+        batch_size=batch_size,
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: get_web3_provider(
+                web3_provider_type,
+                lambda file: read_resource(resource_group, file),
+                batch=True,
+            )
+        ),
+        max_workers=5,
+        item_exporter=blocks_and_transactions_item_exporter(
+            blocks_output=blocks_output_file,
+            transactions_output=transactions_output_file,
+        ),
+        cluster='mainnet',
+        export_blocks=blocks_output_file is not None,
+        export_transactions=transactions_output_file is not None,
+        export_instructions=False,
+    )
+    job.run()
+
+    compare_lines_ignore_order(
+        read_resource(resource_group, "expected_blocks.csv"),
+        read_file(blocks_output_file),
+    )
+
+    compare_lines_ignore_order(
+        read_resource(resource_group, "expected_transactions.csv"),
+        read_file(transactions_output_file),
+    )
+
+
+@pytest.mark.parametrize(
+    "start_block,end_block,batch_size,resource_group,web3_provider_type",
+    [
+        (138802069, 138802069, 1, "blocks_with_transactions_and_instructions", "mock"),
+        skip_if_slow_tests_disabled(
+            (138802069, 138802069, 1,
+             "blocks_with_transactions_and_instructions", "online"),
+        )
+    ],
+)
+def test_export_blocks_job_with_transactions_and_instructions(
+    tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type
+):
+    blocks_output_file = str(tmpdir.join("actual_blocks.csv"))
+    transactions_output_file = str(tmpdir.join("actual_transactions.csv"))
+    instructions_output_file = str(tmpdir.join("actual_instructions.csv"))
+
+    job = ExportBlocksJob(
+        start_block=start_block,
+        end_block=end_block,
+        batch_size=batch_size,
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: get_web3_provider(
+                web3_provider_type,
+                lambda file: read_resource(resource_group, file),
+                batch=True,
+            )
+        ),
+        max_workers=5,
+        item_exporter=blocks_and_transactions_item_exporter(
+            blocks_output=blocks_output_file,
+            transactions_output=transactions_output_file,
+            instructions_output=instructions_output_file,
+        ),
+        cluster='mainnet',
+        export_blocks=blocks_output_file is not None,
+        export_transactions=transactions_output_file is not None,
+        export_instructions=instructions_output_file is not None,
+    )
+    job.run()
+
+    compare_lines_ignore_order(
+        read_resource(resource_group, "expected_blocks.csv"),
+        read_file(blocks_output_file),
+    )
+
+    compare_lines_ignore_order(
+        read_resource(resource_group, "expected_transactions.csv"),
+        read_file(transactions_output_file),
+    )
+
+    compare_lines_ignore_order(
+        read_resource(resource_group, "expected_instructions.csv"),
+        read_file(instructions_output_file),
     )
