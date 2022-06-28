@@ -16,7 +16,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
-from time import sleep
 from typing import List
 
 from blockchainetl_common.jobs.base_job import BaseJob
@@ -31,6 +30,7 @@ from solanaetl.mappers.block_mapper import BlockMapper
 from solanaetl.mappers.instruction_mapper import InstructionMapper
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
+from solanaetl.services.instruction_parser import InstructionParser
 from solanaetl.utils import rpc_response_batch_to_results, validate_range
 
 
@@ -42,6 +42,7 @@ class ExportBlocksJob(BaseJob):
                  batch_web3_provider: BatchProvider,
                  max_workers,
                  item_exporter: CompositeItemExporter,
+                 cluster='mainnet',
                  export_blocks=True,
                  export_transactions=True,
                  export_instructions=True) -> None:
@@ -53,6 +54,7 @@ class ExportBlocksJob(BaseJob):
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
+        self.cluster = cluster
 
         self.export_blocks = export_blocks
         self.export_transactions = export_transactions
@@ -70,6 +72,7 @@ class ExportBlocksJob(BaseJob):
         self.transaction_mapper = TransactionMapper()
         self.instruction_mapper = InstructionMapper()
         self.account_mapper = AccountMapper()
+        self.instruction_parser = InstructionParser()
 
     def _start(self):
         self.item_exporter.open()
@@ -110,6 +113,8 @@ class ExportBlocksJob(BaseJob):
         # instructions
         if self.export_instructions:
             for instruction in transaction.instructions:
+                instruction = self.instruction_parser.parse(
+                    instruction, cluster=self.cluster)
                 self.item_exporter.export_item(
                     self.instruction_mapper.instruction_to_dict(instruction))
 
