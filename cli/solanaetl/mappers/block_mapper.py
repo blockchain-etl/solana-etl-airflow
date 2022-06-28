@@ -57,8 +57,9 @@ class BlockMapper(object):
                 for tx in json_dict['transactions']
                 if isinstance(tx, dict)
             ]
-
-        block.transaction_count = len(json_dict['transactions'])
+            block.transaction_count = len(json_dict.get('transactions'))
+        elif 'signatures' in json_dict:
+            block.transaction_count = len(json_dict.get('signatures'))
 
         return block
 

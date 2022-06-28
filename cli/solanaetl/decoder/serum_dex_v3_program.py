@@ -116,7 +116,6 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'instruction': u8,
         },
         Instruction.Prune.value: {
-            'name': Instruction.Prune.name,
             'instruction': u8,
         },
         Instruction.ConsumeEventsPermissioned.value: {
