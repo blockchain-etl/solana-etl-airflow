@@ -32,9 +32,9 @@ logging_basic_config()
               help='The file containing transaction addresses, one per line.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
+@click.option('-p', '--provider-uri', default='https://solana-api.projectserum.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
-                   'https://api.mainnet-beta.solana.com')
+                   'https://solana-api.projectserum.com')
 @click.option('-c', '--chain', default='solana', show_default=True, type=str, help='The chain network to connect to.')
 def export_instructions(transaction_addresses, output, max_workers, provider_uri, chain='solana'):
     """Exports instructions in transactions."""
