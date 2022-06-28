@@ -31,10 +31,12 @@ class Account(object):
         # if type = token account
         self.is_native = None
         self.mint = None  # token address
+        self.mint_authority = None
         self.owner = None
         self.state = None
         self.token_amount = None
         self.token_amount_decimals = None
+        self.supply = None
         # if type = program
         self.program_data = None
         # if type = vote
