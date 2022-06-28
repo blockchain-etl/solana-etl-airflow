@@ -66,6 +66,12 @@ class AccountMapper(object):
                             account_info.get('priorVoters'))
                         account.root_slot = account_info.get('rootSlot')
                         account.votes = json.dumps(account_info.get('votes'))
+                    elif account.account_type == 'mint':
+                        account.token_amount_decimals = account_info.get(
+                            'decimals')
+                        account.mint_authority = account_info.get(
+                            'mintAuthority')
+                        account.supply = account_info.get('supply')
 
         if account.account_type is None:
             # save raw data for unclassified account type
