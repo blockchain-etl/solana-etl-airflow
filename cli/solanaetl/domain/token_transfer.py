@@ -16,17 +16,10 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from solanaetl.domain.token import Token
-
-
-class TokenMapper(object):
-    def token_to_dict(self, token: Token):
-        return {
-            'type': 'token',
-            # 'address': token.address,
-            # 'symbol': token.symbol,
-            # 'name': token.name,
-            # 'decimals': token.decimals,
-            # 'total_supply': token.total_supply,
-            # 'block_number': token.block_number
-        }
+class TokenTransfer(object):
+    def __init__(self) -> None:
+        self.source = None
+        self.destination = None
+        self.authority = None
+        self.value = None
+        self.tx_signature = None

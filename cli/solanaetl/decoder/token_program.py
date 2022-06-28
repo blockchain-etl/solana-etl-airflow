@@ -19,14 +19,14 @@
 from typing import Dict
 
 from based58 import b58decode
-from solanaetl.decoder.utils import decode_params, u4, u64
+from solanaetl.decoder.utils import decode_params, u8, u64
 
 # See: https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs
 
 
 def decode(data: str) -> Dict[str, object]:
     data_decoded = b58decode(data.encode())
-    program_func_index, _ = u4(data_decoded)
+    program_func_index, _ = u8(data_decoded)
     decoding_params = {
         # Transfer
         #
@@ -41,7 +41,7 @@ def decode(data: str) -> Dict[str, object]:
         #   2. `[]` The source account's multisignature owner/delegate.
         #   3. ..3+M `[signer]` M signer accounts.
         3: {
-            "instruction": u4,
+            "instruction": u8,
             "amount": u64,
         },
     }

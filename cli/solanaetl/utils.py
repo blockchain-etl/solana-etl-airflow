@@ -26,6 +26,11 @@ from blockchainetl_common.file_utils import get_file_handle, smart_open
 from solanaetl.misc.retriable_value_error import RetriableValueError
 
 
+def chunk(a, chunk_size):
+    for i in range(0, len(a), chunk_size):
+        yield a[i:i + chunk_size]
+
+
 def hex_to_dec(hex_string):
     if hex_string is None:
         return None
@@ -118,3 +123,10 @@ def extract_field(input_file, output_file, field):
     with get_item_iterable(input_file) as item_iterable, smart_open(output_file, 'w') as output:
         for item in item_iterable:
             output.write(item[field] + '\n')
+
+
+def safe_get(arr: list, index: int, default=None):
+    try:
+        return arr[index]
+    except:
+        return default

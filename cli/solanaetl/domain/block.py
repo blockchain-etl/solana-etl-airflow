@@ -27,5 +27,6 @@ class Block(object):
         self.previous_block_hash = None
         self.transaction_count = None
         self.transactions: list[Transaction] = None
-        self.reward = None
+        self.rewards = None
+        self.leader_reward = None
         self.leader = None

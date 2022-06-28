@@ -17,7 +17,7 @@
 
 
 import logging
-from typing import Callable, Dict
+from typing import Any, Callable
 
 from based58 import b58encode
 
@@ -32,8 +32,12 @@ def uint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
     return int.from_bytes(data[offset:n_bytes], byteorder="little"), offset+n_bytes
 
 
-def u4(data: bytes, offset: int = 0) -> tuple[int, int]:
+def u8(data: bytes, offset: int = 0) -> tuple[int, int]:
     return uint(data, 1, offset)
+
+
+def u16(data: bytes, offset: int = 0) -> tuple[int, int]:
+    return uint(data, 2, offset)
 
 
 def u32(data: bytes, offset: int = 0) -> tuple[int, int]:
@@ -42,6 +46,10 @@ def u32(data: bytes, offset: int = 0) -> tuple[int, int]:
 
 def u64(data: bytes, offset: int = 0) -> tuple[int, int]:
     return uint(data, 8, offset)
+
+
+def u128(data: bytes, offset: int = 0) -> tuple[int, int]:
+    return uint(data, 16, offset)
 
 
 def ns64(data: bytes, offset: int = 0) -> tuple[int, int]:
@@ -59,14 +67,18 @@ def public_key(data: bytes, offset: int = 0) -> tuple[str, int]:
     return b58encode(public_key_bytes).decode("utf-8"), next_offset
 
 
-def decode_params(data: bytes, decoding_params: Dict[int, Dict[str, Callable[[bytes, int], tuple[bytes, int]]]], func_index: int) -> Dict[str, object]:
+def decode_params(data: bytes, decoding_params: dict[int, dict[str, Any]], func_index: int, program='unspecified') -> dict[str, object]:
     offset = 0
     decoded_params = {}
 
-    for property, hanlde_func in decoding_params.get(func_index).items():
-        decoded_params[property], offset = hanlde_func(data, offset)
+    for property, handler in decoding_params.get(func_index).items():
+        if isinstance(handler, Callable):
+            decoded_params[property], offset = handler(data, offset)
+        else:
+            decoded_params[property] = handler
 
     if offset != len(data):
-        logging.warning(f"Decoded data not fit to original data")
+        logging.warning(
+            f"Decoded data of intruction {func_index} of {program} not fit to original data\texpected = {len(data)}\tactual = {offset}")
 
     return decoded_params

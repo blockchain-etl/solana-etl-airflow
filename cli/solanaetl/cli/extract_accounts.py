@@ -15,22 +15,41 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import click
-from blockchainetl_common.logging_utils import logging_basic_config
+import csv
+import json
 
-logging_basic_config()
+import click
+from blockchainetl_common.file_utils import smart_open
+from solanaetl.jobs.exporters.accounts_item_exporter import \
+    accounts_item_exporter
+from solanaetl.jobs.extract_accounts_job import ExtractAccountsJob
+from solanaetl.providers.auto import get_provider_from_uri
+from solanaetl.thread_local_proxy import ThreadLocalProxy
+
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-t', '--token-addresses', required=True, type=str,
-              help='The file containing token addresses, one per line.')
+@click.option('-t', '--transactions', type=str, required=True, help='The CSV file containing transactions.')
+@click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'https://api.mainnet-beta.solana.com')
-@click.option('-c', '--chain', default='solana', show_default=True, type=str, help='The chain network to connect to.')
-def export_tokens(token_addresses, output, max_workers, provider_uri, chain='solana'):
-    """Exports ERC20/ERC721 tokens."""
+def extract_accounts(transactions, batch_size, output, max_workers, provider_uri):
+    """Extracts Accounts from transactions file."""
+    with smart_open(transactions, 'r') as transactions_file:
+        if transactions.endswith('.json'):
+            transactions_reader = (json.loads(line)
+                                   for line in transactions_file)
+        else:
+            transactions_reader = csv.DictReader(transactions_file)
 
-    # TODO: Implement me
-    pass
+        job = ExtractAccountsJob(
+            batch_web3_provider=ThreadLocalProxy(
+                lambda: get_provider_from_uri(provider_uri, batch=True)),
+            transactions_iterable=transactions_reader,
+            batch_size=batch_size,
+            max_workers=max_workers,
+            item_exporter=accounts_item_exporter(output))
+
+        job.run()

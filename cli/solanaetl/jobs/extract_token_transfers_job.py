@@ -16,55 +16,53 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import json
-
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.domain.instruction import Instruction
-from solanaetl.domain.transaction import Transaction
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
-from solanaetl.json_rpc_requests import generate_get_transaction_json_rpc
 from solanaetl.mappers.instruction_mapper import InstructionMapper
-from solanaetl.mappers.transaction_mapper import TransactionMapper
+from solanaetl.mappers.token_transfer_mapper import TokenTransferMapper
 from solanaetl.providers.batch import BatchProvider
-from solanaetl.utils import rpc_response_batch_to_results
+from solanaetl.services.token_transfer_extractor import TokenTransferExtractor
 
 
-class ExportInstructionsJob(BaseJob):
-    def __init__(self, batch_web3_provider: BatchProvider, item_exporter: CompositeItemExporter, transaction_addresses_iterable, max_workers) -> None:
-        self.item_exporter = item_exporter
-        self.transaction_addresses_iterable = transaction_addresses_iterable
-        self.batch_work_executor = BatchWorkExecutor(1, max_workers)
+class ExtractTokenTransfersJob(BaseJob):
+    def __init__(
+            self,
+            batch_web3_provider: BatchProvider,
+            instructions_iterable,
+            batch_size,
+            max_workers,
+            item_exporter: CompositeItemExporter):
         self.batch_web3_provider = batch_web3_provider
+        self.instructions_iterable = instructions_iterable
 
-        self.transaction_mapper = TransactionMapper()
+        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.item_exporter = item_exporter
+
         self.instruction_mapper = InstructionMapper()
+        self.token_transfer_mapper = TokenTransferMapper()
+        self.token_transfer_extractor = TokenTransferExtractor()
 
     def _start(self):
         self.item_exporter.open()
 
     def _export(self):
         self.batch_work_executor.execute(
-            self.transaction_addresses_iterable, self._export_instructions)
+            self.instructions_iterable, self._extract_transfers)
 
-    def _export_instructions(self, transaction_addresses):
-        transactions_rpc = list(
-            generate_get_transaction_json_rpc(transaction_addresses))
-        response = [self.batch_web3_provider.make_batch_request(
-            json.dumps(transaction_rpc)) for transaction_rpc in transactions_rpc]
-        results = rpc_response_batch_to_results(response)
-        transactions = [self.transaction_mapper.json_dict_to_transaction(
-            result) for result in results]
+    def _extract_transfers(self, instruction_dicts):
+        for instruction_dict in instruction_dicts:
+            self._extract_transfer(instruction_dict)
 
-        for transaction in transactions:
-            self._export_instructions_in_transaction(transaction)
-
-    def _export_instructions_in_transaction(self, transaction: Transaction):
-        for instruction in transaction.instructions:
-            instruction_dict = self.instruction_mapper.instruction_to_dict(
-                instruction)
-            self.item_exporter.export_item(instruction_dict)
+    def _extract_transfer(self, instruction_dict):
+        instruction = self.instruction_mapper.dict_to_instruction(
+            instruction_dict)
+        token_transfer = self.token_transfer_extractor.extract_transfer_from_instruction(
+            instruction)
+        if token_transfer is not None:
+            self.item_exporter.export_item(
+                self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
     def _end(self):
         self.batch_work_executor.shutdown()

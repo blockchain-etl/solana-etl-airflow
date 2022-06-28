@@ -15,30 +15,17 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from solanaetl.domain.account import Account
-from solanaetl.domain.instruction import Instruction
+
+from solanaetl.domain.token_transfer import TokenTransfer
 
 
-class BalanceChange(object):
-    def __init__(self) -> None:
-        self.account = None
-        self.before = None
-        self.after = None
-
-
-class Transaction(object):
-    def __init__(self) -> None:
-        self.signature = None
-        self.block_hash = None
-        self.previous_block_hash = None
-        self.block_number = None
-        self.block_timestamp = None
-        self.fee = None
-        self.status = None
-        self.err = None
-        self.accounts: list[dict] = []
-        self.instructions: list[Instruction] = []
-        self.log_messages: list[str] = []
-        self.balance_changes: list[int] = []
-        self.pre_token_balances = None
-        self.post_token_balances = None
+class TokenTransferMapper(object):
+    def token_transfer_to_dict(self, token_transfer: TokenTransfer):
+        return {
+            'type': 'token_transfer',
+            'source': token_transfer.source,
+            'destination': token_transfer.destination,
+            'authority': token_transfer.authority,
+            'value': token_transfer.value,
+            'tx_signature': token_transfer.tx_signature,
+        }

@@ -38,6 +38,17 @@ def generate_get_transaction_json_rpc(tranaction_signatures, encoding='jsonParse
         )
 
 
+def generate_get_multiple_accounts_json_rpc(accounts, encoding='jsonParsed'):
+    for idx, account in enumerate(accounts):
+        yield generate_json_rpc(
+            method='getMultipleAccounts',
+            params=[account, {
+                'encoding': encoding,
+            }],
+            request_id=idx
+        )
+
+
 def generate_json_rpc(method, params, request_id=1):
     return {
         'jsonrpc': '2.0',

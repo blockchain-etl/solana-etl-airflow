@@ -19,5 +19,31 @@
 class Account(object):
     def __init__(self) -> None:
         self.pubkey = None
-        self.signer = None
-        self.writable = None
+        self.executable = None
+        self.lamports = None
+        self.owner = None
+        self.rent_epoch = None
+        self.data = None  # raw data
+        # parsed data
+        self.program = None
+        self.space = None
+        self.account_type = None
+        # if type = token account
+        self.is_native = None
+        self.mint = None  # token address
+        self.owner = None
+        self.state = None
+        self.token_amount = None
+        self.token_amount_decimals = None
+        # if type = program
+        self.program_data = None
+        # if type = vote
+        self.authorized_voters = None
+        self.authorized_withdrawer = None
+        self.prior_voters = None
+        self.node_pubkey = None
+        self.commission = None
+        self.epoch_credits = None
+        self.votes = None
+        self.root_slot = None
+        self.last_timestamp = None

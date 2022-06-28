@@ -16,6 +16,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import json
 from solanaetl.domain.instruction import Instruction
 
 
@@ -46,10 +47,25 @@ class InstructionMapper(object):
             'tx_signature': instruction.tx_signature,
             'index': instruction.index,
             'parent_index': instruction.parent_index,
-            'accounts': instruction.accounts,
+            'accounts': json.dumps(instruction.accounts),
             'data': instruction.data,
             'program': instruction.program,
             'program_id': instruction.program_id,
             'instruction_type': instruction.instruction_type,
-            'params': instruction.params,
+            'params': json.dumps(instruction.params),
         }
+
+    def dict_to_instruction(self, dict: dict):
+        instruction = Instruction()
+
+        instruction.tx_signature = dict.get('tx_signature')
+        instruction.index = dict.get('index')
+        instruction.parent_index = dict.get('parent_index')
+        instruction.accounts = json.loads(dict.get('accounts'))
+        instruction.data = dict.get('data')
+        instruction.program = dict.get('program')
+        instruction.program_id = dict.get('program_id')
+        instruction.instruction_type = dict.get('instruction_type')
+        instruction.params = json.loads(dict.get('params'))
+
+        return instruction

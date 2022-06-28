@@ -21,50 +21,68 @@ import json
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.domain.instruction import Instruction
-from solanaetl.domain.transaction import Transaction
+from solanaetl.domain.account import Account
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
-from solanaetl.json_rpc_requests import generate_get_transaction_json_rpc
-from solanaetl.mappers.instruction_mapper import InstructionMapper
+from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
+from solanaetl.mappers.account_mapper import AccountMapper
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
 from solanaetl.utils import rpc_response_batch_to_results
 
 
-class ExportInstructionsJob(BaseJob):
-    def __init__(self, batch_web3_provider: BatchProvider, item_exporter: CompositeItemExporter, transaction_addresses_iterable, max_workers) -> None:
-        self.item_exporter = item_exporter
-        self.transaction_addresses_iterable = transaction_addresses_iterable
-        self.batch_work_executor = BatchWorkExecutor(1, max_workers)
+class ExtractAccountsJob(BaseJob):
+    def __init__(
+            self,
+            batch_web3_provider: BatchProvider,
+            transactions_iterable,
+            batch_size,
+            max_workers,
+            item_exporter: CompositeItemExporter):
         self.batch_web3_provider = batch_web3_provider
+        self.transactions_iterable = transactions_iterable
+
+        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.item_exporter = item_exporter
 
         self.transaction_mapper = TransactionMapper()
-        self.instruction_mapper = InstructionMapper()
+        self.account_mapper = AccountMapper()
 
     def _start(self):
         self.item_exporter.open()
 
     def _export(self):
-        self.batch_work_executor.execute(
-            self.transaction_addresses_iterable, self._export_instructions)
+        accountKeys = set({})
+        for transaction_dict in self.transactions_iterable:
+            transaction = self.transaction_mapper.dict_to_transaction(
+                transaction_dict)
+            accountKeys = accountKeys.union(set([account.get('pubkey')
+                                                for account in transaction.accounts]))
 
-    def _export_instructions(self, transaction_addresses):
-        transactions_rpc = list(
-            generate_get_transaction_json_rpc(transaction_addresses))
+        accountKeys = list(accountKeys)
+        self.batch_work_executor.execute(accountKeys, self._extract_accounts)
+
+    def _extract_accounts(self, accountKeys: list):
+        rpc_requests = list(
+            generate_get_multiple_accounts_json_rpc([accountKeys]))
+
         response = [self.batch_web3_provider.make_batch_request(
-            json.dumps(transaction_rpc)) for transaction_rpc in transactions_rpc]
+            json.dumps(rpc_request)) for rpc_request in rpc_requests]
         results = rpc_response_batch_to_results(response)
-        transactions = [self.transaction_mapper.json_dict_to_transaction(
-            result) for result in results]
 
-        for transaction in transactions:
-            self._export_instructions_in_transaction(transaction)
+        accounts = [
+            self.account_mapper.json_dict_to_account(
+                json_dict, accountKey=accountKeys[idx])
+            for result in results
+            for idx, json_dict in enumerate(result.get('value'))
+            if json_dict is not None
+        ]
 
-    def _export_instructions_in_transaction(self, transaction: Transaction):
-        for instruction in transaction.instructions:
-            instruction_dict = self.instruction_mapper.instruction_to_dict(
-                instruction)
-            self.item_exporter.export_item(instruction_dict)
+        for account in accounts:
+            self._extract_account(account)
+
+    def _extract_account(self, account: Account):
+        self.item_exporter.export_item(
+            self.account_mapper.account_to_dict(account))
 
     def _end(self):
         self.batch_work_executor.shutdown()
