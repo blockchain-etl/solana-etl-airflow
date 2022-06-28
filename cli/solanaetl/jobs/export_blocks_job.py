@@ -16,7 +16,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
-from typing import List
 
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
@@ -84,11 +83,11 @@ class ExportBlocksJob(BaseJob):
             total_items=self.end_block - self.start_block + 1
         )
 
-    def _export_batch(self, block_number_batch: List[int]):
+    def _export_batch(self, block_number_batch: list[int]):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(
             block_number_batch, self.export_transactions))
-        response = [self.batch_web3_provider.make_batch_request(
-            json.dumps(block_rpc)) for block_rpc in blocks_rpc]
+        response = self.batch_web3_provider.make_batch_request(
+            json.dumps(blocks_rpc))
         results = rpc_response_batch_to_results(response)
         blocks = [self.block_mapper.json_dict_to_block(
             result) for result in results]

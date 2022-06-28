@@ -65,8 +65,8 @@ class ExtractAccountsJob(BaseJob):
         rpc_requests = list(
             generate_get_multiple_accounts_json_rpc([accountKeys]))
 
-        response = [self.batch_web3_provider.make_batch_request(
-            json.dumps(rpc_request)) for rpc_request in rpc_requests]
+        response = self.batch_web3_provider.make_batch_request(
+            json.dumps(rpc_requests))
         results = rpc_response_batch_to_results(response)
 
         accounts = [

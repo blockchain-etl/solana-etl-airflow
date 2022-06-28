@@ -29,7 +29,7 @@ logging_basic_config()
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-s', '--start-block', default=0, show_default=True, type=int, help='Start block')
 @click.option('-e', '--end-block', required=True, type=int, help='End block')
-@click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to export at a time.')
+@click.option('-b', '--batch-size', default=1, show_default=True, type=int, help='The number of blocks to export at a time.')
 @click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'https://api.mainnet-beta.solana.com')
