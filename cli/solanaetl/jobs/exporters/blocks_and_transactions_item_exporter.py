@@ -40,10 +40,12 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'block_timestamp',
     'fee',
     'status',
+    'err',
     'accounts',
     'log_messages',
     'balance_changes',
-    'token_balance_changes',
+    'pre_token_balances',
+    'post_token_balances',
 ]
 
 

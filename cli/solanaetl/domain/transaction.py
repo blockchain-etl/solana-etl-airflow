@@ -26,14 +26,6 @@ class BalanceChange(object):
         self.after = None
 
 
-class TokenBalanceChange(BalanceChange):
-    def __init__(self) -> None:
-        self.owner = None
-        self.mint = None
-        self.before_decimals = None
-        self.after_decimals = None
-
-
 class Transaction(object):
     def __init__(self) -> None:
         self.signature = None
@@ -43,8 +35,10 @@ class Transaction(object):
         self.block_timestamp = None
         self.fee = None
         self.status = None
+        self.err = None
         self.accounts: list[dict] = []
         self.instructions: list[Instruction] = []
         self.log_messages: list[str] = []
-        self.balance_changes: list[BalanceChange] = []
-        self.token_balance_changes: list[TokenBalanceChange] = []
+        self.balance_changes: list[int] = []
+        self.pre_token_balances = None
+        self.post_token_balances = None
