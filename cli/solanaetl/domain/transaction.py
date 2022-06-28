@@ -19,6 +19,21 @@ from solanaetl.domain.account import Account
 from solanaetl.domain.instruction import Instruction
 
 
+class BalanceChange(object):
+    def __init__(self) -> None:
+        self.account = None
+        self.before = None
+        self.after = None
+
+
+class TokenBalanceChange(BalanceChange):
+    def __init__(self) -> None:
+        self.owner = None
+        self.mint = None
+        self.before_decimals = None
+        self.after_decimals = None
+
+
 class Transaction(object):
     def __init__(self) -> None:
         self.signature = None
@@ -30,3 +45,6 @@ class Transaction(object):
         self.status = None
         self.accounts: list[dict] = []
         self.instructions: list[Instruction] = []
+        self.log_messages: list[str] = []
+        self.balance_changes: list[BalanceChange] = []
+        self.token_balance_changes: list[TokenBalanceChange] = []

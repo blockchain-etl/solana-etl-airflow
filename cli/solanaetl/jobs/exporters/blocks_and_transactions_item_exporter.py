@@ -27,7 +27,8 @@ BLOCK_FIELDS_TO_EXPORT = [
     'previous_block_hash',
     'timestamp',
     'transaction_count',
-    'reward',
+    'rewards',
+    'leader_reward',
     'leader',
 ]
 
@@ -40,6 +41,9 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'fee',
     'status',
     'accounts',
+    'log_messages',
+    'balance_changes',
+    'token_balance_changes',
 ]
 
 
