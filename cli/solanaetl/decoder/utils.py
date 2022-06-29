@@ -17,7 +17,8 @@
 
 
 import logging
-from typing import Any, Callable
+from inspect import isfunction, signature
+from typing import Any
 
 from base58 import b58encode
 
@@ -28,8 +29,14 @@ def rounded_int64(hi32, lo32):
     return hi32 * V2E32 + lo32
 
 
+def sint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
+    data_bytes, offset = blob(data, n_bytes, offset)
+    return int.from_bytes(data_bytes, byteorder="little", signed=True), offset
+
+
 def uint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
-    return int.from_bytes(data[offset:n_bytes], byteorder="little"), offset+n_bytes
+    data_bytes, offset = blob(data, n_bytes, offset)
+    return int.from_bytes(data_bytes, byteorder="little"), offset
 
 
 def u8(data: bytes, offset: int = 0) -> tuple[int, int]:
@@ -70,10 +77,13 @@ def public_key(data: bytes, offset: int = 0) -> tuple[str, int]:
 def decode_params(data: bytes, decoding_params: dict[int, dict[str, Any]], func_index: int, program='unspecified') -> dict[str, object]:
     offset = 0
     decoded_params = {}
-
     for property, handler in decoding_params.get(func_index).items():
-        if isinstance(handler, Callable):
-            decoded_params[property], offset = handler(data, offset)
+        if isfunction(handler):
+            params = signature(handler).parameters
+            if len(params) == 2:
+                decoded_params[property], offset = handler(data, offset)
+            else:
+                decoded_params[property] = handler()
         else:
             decoded_params[property] = handler
 

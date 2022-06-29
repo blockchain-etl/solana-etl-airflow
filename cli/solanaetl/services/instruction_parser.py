@@ -33,4 +33,7 @@ class InstructionParser(object):
             instruction.instruction_type = serum_dex_v3_program.Instruction(
                 instruction.params.get('instruction')).name
 
+        if 'instruction' in instruction.params:
+            del instruction.params['instruction']
+
         return instruction
