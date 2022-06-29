@@ -35,7 +35,6 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'https://api.mainnet-beta.solana.com')
-@click.option('-c', '--chain', default='solana', show_default=True, type=str, help='The chain network to connect to.')
 def export_instructions(transaction_addresses, output, max_workers, provider_uri):
     """Exports instructions in transactions."""
 

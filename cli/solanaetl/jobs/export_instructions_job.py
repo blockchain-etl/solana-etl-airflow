@@ -28,6 +28,7 @@ from solanaetl.json_rpc_requests import generate_get_transaction_json_rpc
 from solanaetl.mappers.instruction_mapper import InstructionMapper
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
+from solanaetl.services.instruction_parser import InstructionParser
 from solanaetl.utils import rpc_response_batch_to_results
 
 
@@ -40,6 +41,7 @@ class ExportInstructionsJob(BaseJob):
 
         self.transaction_mapper = TransactionMapper()
         self.instruction_mapper = InstructionMapper()
+        self.instruction_parser = InstructionParser()
 
     def _start(self):
         self.item_exporter.open()
@@ -62,6 +64,7 @@ class ExportInstructionsJob(BaseJob):
 
     def _export_instructions_in_transaction(self, transaction: Transaction):
         for instruction in transaction.instructions:
+            instruction = self.instruction_parser.parse(instruction)
             instruction_dict = self.instruction_mapper.instruction_to_dict(
                 instruction)
             self.item_exporter.export_item(instruction_dict)
