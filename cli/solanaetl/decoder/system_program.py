@@ -18,7 +18,7 @@
 
 from typing import Dict
 
-from based58 import b58decode
+from base58 import b58decode
 from solanaetl.decoder.utils import decode_params, ns64, public_key, u32, u64
 
 # See: https://docs.rs/solana-program/latest/src/solana_program/system_instruction.rs.html

@@ -18,7 +18,7 @@
 
 from typing import Dict
 
-from based58 import b58decode
+from base58 import b58decode
 from solanaetl.decoder.utils import decode_params, u8, u64
 
 # See: https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs
