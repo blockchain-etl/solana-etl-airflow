@@ -32,9 +32,9 @@ from solanaetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://solana-api.projectserum.com', show_default=True, type=str,
+@click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
-                   'https://solana-api.projectserum.com')
+                   'https://api.mainnet-beta.solana.com')
 def extract_token_transfers(instructions, batch_size, output, max_workers, provider_uri):
     """Extracts Token transfers from instructions file."""
     with smart_open(instructions, 'r') as instructions_file:

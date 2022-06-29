@@ -30,9 +30,9 @@ logging_basic_config()
 @click.option('-s', '--start-block', default=0, show_default=True, type=int, help='Start block')
 @click.option('-e', '--end-block', required=True, type=int, help='End block')
 @click.option('-b', '--batch-size', default=1, show_default=True, type=int, help='The number of blocks to export at a time.')
-@click.option('-p', '--provider-uri', default='https://solana-api.projectserum.com', show_default=True, type=str,
+@click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
-                   'https://solana-api.projectserum.com')
+                   'https://api.mainnet-beta.solana.com')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('--blocks-output', default=None, show_default=True, type=str,
               help='The output file for blocks. If not provided blocks will not be exported. Use "-" for stdout')
