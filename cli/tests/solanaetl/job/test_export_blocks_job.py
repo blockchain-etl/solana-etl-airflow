@@ -62,7 +62,6 @@ def test_export_blocks_job_blocks_only(
         item_exporter=blocks_and_transactions_item_exporter(
             blocks_output=blocks_output_file,
         ),
-        cluster='mainnet',
         export_blocks=blocks_output_file is not None,
         export_transactions=False,
         export_instructions=False,
@@ -106,7 +105,6 @@ def test_export_blocks_job_with_transactions(
             blocks_output=blocks_output_file,
             transactions_output=transactions_output_file,
         ),
-        cluster='mainnet',
         export_blocks=blocks_output_file is not None,
         export_transactions=transactions_output_file is not None,
         export_instructions=False,
@@ -158,7 +156,6 @@ def test_export_blocks_job_with_transactions_and_instructions(
             transactions_output=transactions_output_file,
             instructions_output=instructions_output_file,
         ),
-        cluster='mainnet',
         export_blocks=blocks_output_file is not None,
         export_transactions=transactions_output_file is not None,
         export_instructions=instructions_output_file is not None,
