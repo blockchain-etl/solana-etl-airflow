@@ -15,35 +15,27 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import csv
-import json
 
 import click
-from blockchainetl_common.file_utils import smart_open
 from solanaetl.jobs.exporters.accounts_item_exporter import \
     accounts_item_exporter
 from solanaetl.jobs.extract_accounts_job import ExtractAccountsJob
 from solanaetl.providers.auto import get_provider_from_uri
 from solanaetl.thread_local_proxy import ThreadLocalProxy
+from solanaetl.utils import get_item_iterable
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-t', '--transactions', type=str, required=True, help='The CSV file containing transactions.')
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
-@click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-w', '--max-workers', default=1, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'https://api.mainnet-beta.solana.com')
 def extract_accounts(transactions, batch_size, output, max_workers, provider_uri):
     """Extracts Accounts from transactions file."""
-    with smart_open(transactions, 'r') as transactions_file:
-        if transactions.endswith('.json'):
-            transactions_reader = (json.loads(line)
-                                   for line in transactions_file)
-        else:
-            transactions_reader = csv.DictReader(transactions_file)
-
+    with get_item_iterable(transactions) as transactions_reader:
         job = ExtractAccountsJob(
             batch_web3_provider=ThreadLocalProxy(
                 lambda: get_provider_from_uri(provider_uri, batch=True)),

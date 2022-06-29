@@ -39,7 +39,6 @@ setup(
         "blockchain-etl-common==1.6.1",
         "click==8.1.3",
         "web3==5.29.2",
-        "solana==0.25.0",
         "requests",
     ],
     extras_require={

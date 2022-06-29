@@ -15,22 +15,15 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os
 
-from solanaetl.decoder import serum_dex_v3_program
-from solanaetl.domain.instruction import Instruction
-
-SERUM_DEX_V3 = os.getenv(
-    'SERUM_DEX_V3', '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin')
-
-
-class InstructionParser(object):
-    def parse(self, instruction: Instruction):
-        if instruction.program_id == SERUM_DEX_V3:
-            instruction.program = 'serum-dex-v3'
-            instruction.params = serum_dex_v3_program.decode(
-                data=instruction.data, accounts=instruction.accounts)
-            instruction.instruction_type = serum_dex_v3_program.Instruction(
-                instruction.params.get('instruction')).name
-
-        return instruction
+class Nft(object):
+    def __init__(self) -> None:
+        self.mint = None
+        self.update_authority = None
+        self.name = None
+        self.symbol = None
+        self.uri = None
+        self.seller_fee_basis_points = None
+        self.creators: list = []
+        self.primary_sale_happened = None
+        self.is_mutable = None

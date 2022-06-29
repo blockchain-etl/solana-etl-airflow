@@ -42,9 +42,8 @@ logging_basic_config()
 @click.option('--instructions-output', default=None, show_default=True, type=str,
               help='The output file for instructions. '
                    'If not provided instructions will not be exported. Use "-" for stdout.')
-@click.option('-c', '--cluster', default='mainnet', show_default=True, type=str, help='The solana cluster environment.')
 def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output,
-                                   transactions_output, instructions_output, cluster='mainnet'):
+                                   transactions_output, instructions_output):
     """Exports blocks and transactions."""
     if blocks_output is None and transactions_output is None:
         raise ValueError(
@@ -62,7 +61,6 @@ def export_blocks_and_transactions(start_block, end_block, batch_size, provider_
         max_workers=max_workers,
         item_exporter=blocks_and_transactions_item_exporter(
             blocks_output, transactions_output, instructions_output),
-        cluster=cluster,
         export_blocks=blocks_output is not None,
         export_transactions=transactions_output is not None,
         export_instructions=instructions_output is not None)
