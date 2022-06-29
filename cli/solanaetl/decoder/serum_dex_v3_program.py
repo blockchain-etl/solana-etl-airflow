@@ -107,7 +107,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
         Instruction.consumeEvents.value: {
             'instruction': u32,
             'limit': u16,
-            'open_orders': lambda: list(set(accounts)),
+            'open_orders': lambda: sorted(list(set(accounts))),
             'market': lambda: safe_get(accounts, len(accounts) - 4),
             'event_queue': lambda: safe_get(accounts, len(accounts) - 3),
         },
@@ -271,7 +271,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
         Instruction.consumeEventsPermissioned.value: {
             'instruction': u32,
             'limit': u16,
-            'open_orders': lambda: list(set(accounts)),
+            'open_orders': lambda: sorted(list(set(accounts))),
             'market': lambda: safe_get(accounts, len(accounts) - 3),
             'event_queue': lambda: safe_get(accounts, len(accounts) - 2),
             'crank_authority': lambda: safe_get(accounts, len(accounts) - 1),
