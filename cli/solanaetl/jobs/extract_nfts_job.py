@@ -16,73 +16,77 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import base64
 import json
 
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.domain.account import Account
+from solanaetl.decoder.metaplex.metadata import (get_metadata_account,
+                                                 unpack_metadata_account)
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
 from solanaetl.mappers.account_mapper import AccountMapper
-from solanaetl.mappers.transaction_mapper import TransactionMapper
+from solanaetl.mappers.nft_mapper import NftMapper
 from solanaetl.providers.batch import BatchProvider
 from solanaetl.utils import rpc_response_batch_to_results
 
 
-class ExtractAccountsJob(BaseJob):
+class ExtractNftsJob(BaseJob):
     def __init__(
             self,
             batch_web3_provider: BatchProvider,
-            transactions_iterable,
+            accounts_iterable,
             batch_size,
             max_workers,
             item_exporter: CompositeItemExporter):
         self.batch_web3_provider = batch_web3_provider
-        self.transactions_iterable = transactions_iterable
+        self.accounts_iterable = accounts_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
 
-        self.transaction_mapper = TransactionMapper()
         self.account_mapper = AccountMapper()
+        self.nft_mapper = NftMapper()
 
     def _start(self):
         self.item_exporter.open()
 
     def _export(self):
-        account_keys = set({})
-        for transaction_dict in self.transactions_iterable:
-            transaction = self.transaction_mapper.dict_to_transaction(
-                transaction_dict)
-            account_keys = account_keys.union(set([account.get('pubkey')
-                                                   for account in transaction.accounts]))
+        metadata_accounts = set({})
+        accounts = [
+            self.account_mapper.dict_to_account(account_dict)
+            for account_dict in self.accounts_iterable
+        ]
+        for account in accounts:
+            if account.token_amount_decimals == '0':
+                metadata_accounts.add(
+                    str(get_metadata_account(account.pubkey)))
 
-        account_keys = list(account_keys)
-        self.batch_work_executor.execute(account_keys, self._extract_accounts)
+        self.batch_work_executor.execute(
+            metadata_accounts, self._extract_nfts)
 
-    def _extract_accounts(self, account_keys: list):
+    def _extract_nfts(self, metadata_accounts: list[str]):
         rpc_requests = list(
-            generate_get_multiple_accounts_json_rpc([account_keys]))
+            generate_get_multiple_accounts_json_rpc([metadata_accounts], encoding='base64'))
 
         response = self.batch_web3_provider.make_batch_request(
             json.dumps(rpc_requests))
         results = rpc_response_batch_to_results(response)
 
-        accounts = [
-            self.account_mapper.json_dict_to_account(
-                json_dict, accountKey=account_keys[idx])
-            for result in results
-            for idx, json_dict in enumerate(result.get('value'))
-            if json_dict is not None
-        ]
+        nfts = []
 
-        for account in accounts:
-            self._extract_account(account)
+        for result in results:
+            for value in result.get('value'):
+                if value is not None:
+                    data = base64.b64decode(value.get('data')[0])
+                    metadata = unpack_metadata_account(data)
+                    nfts.append(
+                        self.nft_mapper.metaplex_metadata_to_nft(metadata))
 
-    def _extract_account(self, account: Account):
-        self.item_exporter.export_item(
-            self.account_mapper.account_to_dict(account))
+        for nft in nfts:
+            self.item_exporter.export_item(
+                self.nft_mapper.nft_to_dict(nft))
 
     def _end(self):
         self.batch_work_executor.shutdown()

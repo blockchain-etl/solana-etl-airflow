@@ -16,34 +16,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from typing import Dict
-
-from base58 import b58decode
-from solanaetl.decoder.utils import decode_params, u8, u64
-
-# See: https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs
-
-
-def decode(data: str) -> Dict[str, object]:
-    data_decoded = b58decode(data.encode())
-    program_func_index, _ = u8(data_decoded)
-    decoding_params = {
-        # Transfer
-        #
-        # * Single owner/delegate
-        #   0. `[writable]` The source account.
-        #   1. `[writable]` The destination account.
-        #   2. `[signer]` The source account's owner/delegate.
-        #
-        # * Multisignature owner/delegate
-        #   0. `[writable]` The source account.
-        #   1. `[writable]` The destination account.
-        #   2. `[]` The source account's multisignature owner/delegate.
-        #   3. ..3+M `[signer]` M signer accounts.
-        3: {
-            "instruction": u8,
-            "amount": u64,
-        },
-    }
-
-    return decode_params(data_decoded, decoding_params, program_func_index)
+class Nft(object):
+    def __init__(self) -> None:
+        self.mint = None
+        self.update_authority = None
+        self.name = None
+        self.symbol = None
+        self.uri = None
+        self.seller_fee_basis_points = None
+        self.creators: list = []
+        self.primary_sale_happened = None
+        self.is_mutable = None

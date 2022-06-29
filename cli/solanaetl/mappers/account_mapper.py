@@ -108,3 +108,11 @@ class AccountMapper(object):
             'last_timestamp': account.last_timestamp,
             'data': account.data,
         }
+
+    def dict_to_account(self, dict: dict) -> Account:
+        account = Account()
+
+        account.pubkey = dict.get('pubkey')
+        account.token_amount_decimals = dict.get('token_amount_decimals')
+
+        return account

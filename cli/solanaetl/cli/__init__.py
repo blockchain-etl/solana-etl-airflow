@@ -22,6 +22,7 @@ from solanaetl.cli.export_instructions import export_instructions
 from solanaetl.cli.export_tokens import export_tokens
 from solanaetl.cli.extract_accounts import extract_accounts
 from solanaetl.cli.extract_field import extract_field
+from solanaetl.cli.extract_nfts import extract_nfts
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 
 
@@ -41,6 +42,7 @@ cli.add_command(export_instructions, 'export_instructions')
 # extract
 cli.add_command(extract_token_transfers, 'extract_token_transfers')
 cli.add_command(extract_accounts, 'extract_accounts')
+cli.add_command(extract_nfts, 'extract_nfts')
 
 # utils
 cli.add_command(extract_field, 'extract_field')

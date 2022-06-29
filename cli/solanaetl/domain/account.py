@@ -49,3 +49,4 @@ class Account(object):
         self.votes = None
         self.root_slot = None
         self.last_timestamp = None
+        # if type = mint

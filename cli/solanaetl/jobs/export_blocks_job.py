@@ -41,7 +41,6 @@ class ExportBlocksJob(BaseJob):
                  batch_web3_provider: BatchProvider,
                  max_workers,
                  item_exporter: CompositeItemExporter,
-                 cluster='mainnet',
                  export_blocks=True,
                  export_transactions=True,
                  export_instructions=True) -> None:
@@ -53,7 +52,6 @@ class ExportBlocksJob(BaseJob):
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
-        self.cluster = cluster
 
         self.export_blocks = export_blocks
         self.export_transactions = export_transactions
@@ -112,8 +110,7 @@ class ExportBlocksJob(BaseJob):
         # instructions
         if self.export_instructions:
             for instruction in transaction.instructions:
-                instruction = self.instruction_parser.parse(
-                    instruction, cluster=self.cluster)
+                instruction = self.instruction_parser.parse(instruction)
                 self.item_exporter.export_item(
                     self.instruction_mapper.instruction_to_dict(instruction))
 

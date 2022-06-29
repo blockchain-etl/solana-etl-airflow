@@ -10,11 +10,20 @@ Install Solana ETL CLI:
 python setup.py install
 ```
 
+---
+Environment:
+
+```bash
+> export SERUM_DEX_V3 = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin"
+> export METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+```
+
+---
+
 Export blocks and transactions (include input accounts, instructions):
 
 ```bash
 > solanaetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
-    --provider-uri https://solana-api.projectserum.com \
     --blocks-output blocks.csv \
     --transactions-output transactions.csv \
     --instructions-output instructions.csv
@@ -27,7 +36,6 @@ Export instructions:
 ```bash
 > solanaetl extract_field -i transactions.csv -o transaction_signatures.txt -f signature
 > solanaetl export_instructions \
-    --provider-uri https://solana-api.projectserum.com \
     -t ./transaction_signatures.txt \
     -o instructions.csv
 ```
@@ -48,7 +56,16 @@ Export accounts:
 
 ```bash
 > solanaetl extract_accounts \
-    --provider-uri https://solana-api.projectserum.com \
     -t ./transactions.csv \
     -o accounts.csv
+```
+
+---
+
+Export NFTs:
+
+```bash
+> solanaetl extract_nfts \
+    -a ./accounts.csv \
+    -o nfts.csv
 ```

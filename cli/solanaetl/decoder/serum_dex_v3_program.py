@@ -17,7 +17,7 @@
 
 
 import enum
-from based58 import b58decode
+from base58 import b58decode
 from solanaetl.decoder.utils import decode_params, u8, u16, u32, u64, u128
 from solanaetl.utils import safe_get
 

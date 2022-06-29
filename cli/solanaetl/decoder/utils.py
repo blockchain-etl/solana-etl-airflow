@@ -19,7 +19,7 @@
 import logging
 from typing import Any, Callable
 
-from based58 import b58encode
+from base58 import b58encode
 
 V2E32 = pow(2, 32)
 
