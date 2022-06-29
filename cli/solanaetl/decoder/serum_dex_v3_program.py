@@ -21,7 +21,7 @@ import enum
 from base58 import b58decode
 from solanaetl.decoder.utils import (decode_params, sint, u8, u16, u32, u64,
                                      u128)
-from solanaetl.utils import chunk, safe_get
+from solanaetl.utils import safe_get
 
 # See: https://github.com/project-serum/serum-dex/blob/master/dex/src/instruction.rs
 
