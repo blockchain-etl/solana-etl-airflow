@@ -316,6 +316,6 @@ class SerumDexV3ProgramDecoder(ProgramDecoder):
             },
         }
 
-    def decode(self, data: str, accounts: list[str] = []) -> dict[str, object]:
+    def decode(self, data: str = None, accounts: list[str] = []) -> dict[str, object]:
         # the first bytes is versioned bytes
         return super().decode(data, accounts, initial_offset=1)
