@@ -75,7 +75,6 @@ class ProgramDecoder(object):
                     decoded_params[property] = handler()
             else:
                 decoded_params[property] = handler
-            print(f'property: {property} - offset: {offset}')
 
         if offset != len(data):
             logging.warning(
