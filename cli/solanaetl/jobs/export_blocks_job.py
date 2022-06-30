@@ -87,7 +87,7 @@ class ExportBlocksJob(BaseJob):
         response = self.batch_web3_provider.make_batch_request(
             json.dumps(blocks_rpc))
         results = rpc_response_batch_to_results(response)
-        blocks = [self.block_mapper.json_dict_to_block(
+        blocks = [self.block_mapper.from_json_dict(
             result) for result in results]
 
         for block in blocks:
@@ -96,7 +96,7 @@ class ExportBlocksJob(BaseJob):
     def _export_block(self, block: Block):
         if self.export_blocks:
             self.item_exporter.export_item(
-                self.block_mapper.block_to_dict(block))
+                self.block_mapper.to_dict(block))
 
         # transactions
         if self.export_transactions:
@@ -105,14 +105,14 @@ class ExportBlocksJob(BaseJob):
 
     def _export_transaction(self, transaction: Transaction):
         self.item_exporter.export_item(
-            self.transaction_mapper.transaction_to_dict(transaction))
+            self.transaction_mapper.to_dict(transaction))
 
         # instructions
         if self.export_instructions:
             for instruction in transaction.instructions:
                 instruction = self.instruction_parser.parse(instruction)
                 self.item_exporter.export_item(
-                    self.instruction_mapper.instruction_to_dict(instruction))
+                    self.instruction_mapper.to_dict(instruction))
 
     def _end(self):
         self.batch_work_executor.shutdown()

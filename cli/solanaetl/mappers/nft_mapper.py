@@ -22,7 +22,7 @@ from solanaetl.domain.nft import Nft
 
 
 class NftMapper(object):
-    def metaplex_metadata_to_nft(self, metadata: dict) -> Nft:
+    def from_metaplex_metadata(self, metadata: dict) -> Nft:
         nft = Nft()
         nft.mint = metadata.get('mint')
         nft.update_authority = metadata.get('update_authority')
@@ -47,8 +47,7 @@ class NftMapper(object):
 
         return nft
 
-    # TODO: should change function name become to_dict or make it static and register to init
-    def nft_to_dict(self, nft: Nft) -> dict:
+    def to_dict(self, nft: Nft) -> dict:
         return {
             'type': 'nft',
             'mint': nft.mint,

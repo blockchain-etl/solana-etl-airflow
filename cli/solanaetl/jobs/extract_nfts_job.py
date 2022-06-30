@@ -55,7 +55,7 @@ class ExtractNftsJob(BaseJob):
     def _export(self):
         metadata_accounts = set({})
         accounts = [
-            self.account_mapper.dict_to_account(account_dict)
+            self.account_mapper.from_dict(account_dict)
             for account_dict in self.accounts_iterable
         ]
         for account in accounts:
@@ -82,11 +82,11 @@ class ExtractNftsJob(BaseJob):
                     data = base64.b64decode(value.get('data')[0])
                     metadata = unpack_metadata_account(data)
                     nfts.append(
-                        self.nft_mapper.metaplex_metadata_to_nft(metadata))
+                        self.nft_mapper.from_metaplex_metadata(metadata))
 
         for nft in nfts:
             self.item_exporter.export_item(
-                self.nft_mapper.nft_to_dict(nft))
+                self.nft_mapper.to_dict(nft))
 
     def _end(self):
         self.batch_work_executor.shutdown()

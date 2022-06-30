@@ -53,7 +53,7 @@ class ExtractAccountsJob(BaseJob):
     def _export(self):
         account_keys = set({})
         for transaction_dict in self.transactions_iterable:
-            transaction = self.transaction_mapper.dict_to_transaction(
+            transaction = self.transaction_mapper.from_dict(
                 transaction_dict)
             account_keys = account_keys.union(set([account.get('pubkey')
                                                    for account in transaction.accounts]))
@@ -70,7 +70,7 @@ class ExtractAccountsJob(BaseJob):
         results = rpc_response_batch_to_results(response)
 
         accounts = [
-            self.account_mapper.json_dict_to_account(
+            self.account_mapper.from_json_dict(
                 json_dict, accountKey=account_keys[idx])
             for result in results
             for idx, json_dict in enumerate(result.get('value'))
@@ -82,7 +82,7 @@ class ExtractAccountsJob(BaseJob):
 
     def _extract_account(self, account: Account):
         self.item_exporter.export_item(
-            self.account_mapper.account_to_dict(account))
+            self.account_mapper.to_dict(account))
 
     def _end(self):
         self.batch_work_executor.shutdown()

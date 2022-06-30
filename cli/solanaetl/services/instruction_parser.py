@@ -17,23 +17,26 @@
 
 import os
 
-from solanaetl.decoder import serum_dex_v3_program
+from solanaetl.decoder.program_decoder import ProgramDecoder
+from solanaetl.decoder.serum_dex_v3_program import SerumDexV3ProgramDecoder
 from solanaetl.domain.instruction import Instruction
 
 SERUM_DEX_V3 = os.getenv(
     'SERUM_DEX_V3', '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin')
 
-# TODO: should restructure for easy to register custom program.
-class InstructionParser(object):
-    def parse(self, instruction: Instruction):
-        if instruction.program_id == SERUM_DEX_V3:
-            instruction.program = 'serum-dex-v3'
-            instruction.params = serum_dex_v3_program.decode(
-                data=instruction.data, accounts=instruction.accounts)
-            instruction.instruction_type = serum_dex_v3_program.SerumDexV3Instruction(
-                instruction.params.get('instruction')).name
+# Put your decoder here
+PROGRAM_DECODER: dict[str, ProgramDecoder] = {
+    SERUM_DEX_V3: SerumDexV3ProgramDecoder()
+}
 
-        if 'instruction' in instruction.params:
-            del instruction.params['instruction']
+
+class InstructionParser(object):
+
+    def parse(self, instruction: Instruction):
+        if instruction.program_id in PROGRAM_DECODER:
+            decoder = PROGRAM_DECODER.get(instruction.program_id)
+            instruction.program = decoder.name
+            instruction.instruction_type, instruction.params = decoder.decode(
+                data=instruction.data, accounts=instruction.accounts)
 
         return instruction
