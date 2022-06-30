@@ -30,7 +30,6 @@ ACCOUNT_FIELDS_TO_EXPORT = [
     'account_type',
     'is_native',
     'mint',
-    'owner',
     'state',
     'token_amount',
     'token_amount_decimals',

@@ -92,7 +92,6 @@ class AccountMapper(object):
             'account_type': account.account_type,
             'is_native': account.is_native,
             'mint': account.mint,
-            'owner': account.owner,
             'state': account.state,
             'token_amount': account.token_amount,
             'token_amount_decimals': account.token_amount_decimals,

@@ -58,7 +58,7 @@ class ExtractAccountsJob(BaseJob):
             account_keys = account_keys.union(set([account.get('pubkey')
                                                    for account in transaction.accounts]))
 
-        account_keys = list(account_keys)
+        account_keys = sorted(list(account_keys))
         self.batch_work_executor.execute(account_keys, self._extract_accounts)
 
     def _extract_accounts(self, account_keys: list):

@@ -16,17 +16,22 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import csv
+import io
+
 import pytest
+from solanaetl.jobs.exporters.accounts_item_exporter import accounts_item_exporter
 import tests.resources
-from solanaetl.jobs.export_instructions_job import ExportInstructionsJob
-from solanaetl.jobs.exporters.instructions_item_exporter import \
-    instructions_item_exporter
+from blockchainetl_common.csv_utils import set_max_field_size_limit
+from solanaetl.jobs.exporters.nfts_item_exporter import nfts_item_exporter
+from solanaetl.jobs.extract_accounts_job import ExtractAccountsJob
+from solanaetl.jobs.extract_nfts_job import ExtractNftsJob
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import (compare_lines_ignore_order, read_file,
                            skip_if_slow_tests_disabled)
 from tests.solanaetl.job.helpers import get_web3_provider
 
-RESOURCE_GROUP = 'test_export_instructions_job'
+RESOURCE_GROUP = 'test_extract_accounts_job'
 
 
 def read_resource(resource_group, file_name):
@@ -34,22 +39,21 @@ def read_resource(resource_group, file_name):
 
 
 @pytest.mark.parametrize(
-    'transactions,resource_group,web3_provider_type',
+    'batch_size,resource_group,web3_provider_type',
     [
-        (['21w7wVXW6ZdEkxv1zmZXJPnKXM57vwyDU8VLHwRrD5WTH9ZwgGGWhbQgmF563UAjY6MpG3fktmbs3uiREjXN7iw8'],
-         'instructions_only', 'mock'),
-        skip_if_slow_tests_disabled(
-            (['21w7wVXW6ZdEkxv1zmZXJPnKXM57vwyDU8VLHwRrD5WTH9ZwgGGWhbQgmF563UAjY6MpG3fktmbs3uiREjXN7iw8'],
-             'instructions_only', 'online'),
-        )
+        (100, 'accounts_only', 'mock'),
     ],
 )
-def test_export_instructions(
-    tmpdir, transactions, resource_group, web3_provider_type
+def test_extract_accounts(
+    tmpdir, batch_size, resource_group, web3_provider_type
 ):
-    instructions_output_file = str(tmpdir.join('actual_instructions.csv'))
+    accounts_output_file = str(tmpdir.join('actual_accounts.csv'))
 
-    job = ExportInstructionsJob(
+    transactions_content = read_resource(resource_group, 'transactions.csv')
+    set_max_field_size_limit()
+    transactions_csv_reader = csv.DictReader(io.StringIO(transactions_content))
+
+    job = ExtractAccountsJob(
         batch_web3_provider=ThreadLocalProxy(
             lambda: get_web3_provider(
                 web3_provider_type,
@@ -57,15 +61,16 @@ def test_export_instructions(
                 batch=True,
             )
         ),
+        batch_size=batch_size,
         max_workers=5,
-        item_exporter=instructions_item_exporter(
-            instructions_output=instructions_output_file,
+        item_exporter=accounts_item_exporter(
+            accounts_output=accounts_output_file,
         ),
-        transaction_addresses_iterable=transactions,
+        transactions_iterable=transactions_csv_reader,
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_instructions.csv'),
-        read_file(instructions_output_file),
+        read_resource(resource_group, 'expected_accounts.csv'),
+        read_file(accounts_output_file),
     )
