@@ -21,7 +21,6 @@ import json
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
-from solanaetl.domain.instruction import Instruction
 from solanaetl.domain.transaction import Transaction
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_transaction_json_rpc
@@ -33,7 +32,11 @@ from solanaetl.utils import rpc_response_batch_to_results
 
 
 class ExportInstructionsJob(BaseJob):
-    def __init__(self, batch_web3_provider: BatchProvider, item_exporter: CompositeItemExporter, transaction_addresses_iterable, max_workers) -> None:
+    def __init__(self,
+                 batch_web3_provider: BatchProvider,
+                 item_exporter: CompositeItemExporter,
+                 transaction_addresses_iterable,
+                 max_workers) -> None:
         self.item_exporter = item_exporter
         self.transaction_addresses_iterable = transaction_addresses_iterable
         self.batch_work_executor = BatchWorkExecutor(1, max_workers)

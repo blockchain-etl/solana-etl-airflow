@@ -69,3 +69,10 @@ Export NFTs:
     -a ./accounts.csv \
     -o nfts.csv
 ```
+
+## Test
+
+```bash
+> python -m pip install pytest
+> python -m pytest
+```

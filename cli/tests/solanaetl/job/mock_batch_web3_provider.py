@@ -30,8 +30,8 @@ class MockBatchWeb3Provider(MockWeb3Provider):
         batch = json.loads(text)
         web3_response = []
         for req in batch:
-            method = req["method"]
-            params = req["params"]
+            method = req['method']
+            params = req['params']
             file_name = build_file_name(method, params)
             file_content = self.read_resource(file_name)
             web3_response.extend(json.loads(file_content))
