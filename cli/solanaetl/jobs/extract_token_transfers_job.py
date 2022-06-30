@@ -30,12 +30,10 @@ from solanaetl.services.token_transfer_extractor import \
 class ExtractTokenTransfersJob(BaseJob):
     def __init__(
             self,
-            batch_web3_provider: BatchProvider,
             instructions_iterable,
             batch_size,
             max_workers,
             item_exporter: CompositeItemExporter):
-        self.batch_web3_provider = batch_web3_provider
         self.instructions_iterable = instructions_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)

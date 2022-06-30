@@ -30,15 +30,10 @@ from solanaetl.utils import get_item_iterable
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=1, show_default=True, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
-              help='The URI of the web3 provider e.g. '
-                   'https://api.mainnet-beta.solana.com')
-def extract_token_transfers(instructions, batch_size, output, max_workers, provider_uri):
+def extract_token_transfers(instructions, batch_size, output, max_workers):
     """Extracts Token transfers from instructions file."""
     with get_item_iterable(instructions) as instructions_reader:
         job = ExtractTokenTransfersJob(
-            batch_web3_provider=ThreadLocalProxy(
-                lambda: get_provider_from_uri(provider_uri, batch=True)),
             instructions_iterable=instructions_reader,
             batch_size=batch_size,
             max_workers=max_workers,
