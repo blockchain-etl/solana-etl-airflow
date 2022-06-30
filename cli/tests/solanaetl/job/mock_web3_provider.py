@@ -16,6 +16,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import base64
+import hashlib
 import json
 
 from web3 import IPCProvider
@@ -36,7 +38,8 @@ def build_file_name(method, params):
         'web3_response.'
         + method
         + '_'
-        + '_'.join([param_to_str(param) for param in params])
+        + hashlib.md5('_'.join(sorted([param_to_str(param)
+                                       for param in params])).encode()).hexdigest()
         + '.json'
     )
 
@@ -44,10 +47,10 @@ def build_file_name(method, params):
 def param_to_str(param):
     if isinstance(param, dict):
         return '_'.join(
-            [str(key) + '_' + param_to_str(param[key])
-             for key in sorted(param)]
+            sorted([str(key) + '_' + param_to_str(param[key])
+                    for key in sorted(param)])
         )
     elif isinstance(param, list):
-        return '_'.join([param_to_str(param_item) for param_item in param])
+        return '_'.join(sorted([param_to_str(param_item) for param_item in param]))
     else:
         return str(param).lower()
