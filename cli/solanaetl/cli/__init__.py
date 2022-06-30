@@ -16,6 +16,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import click
+from solanaetl.cli.export_all import export_all
 from solanaetl.cli.export_blocks_and_transactions import \
     export_blocks_and_transactions
 from solanaetl.cli.export_instructions import export_instructions
@@ -34,6 +35,7 @@ def cli(ctx):
 
 
 # export
+cli.add_command(export_all, "export_all")
 cli.add_command(export_blocks_and_transactions,
                 'export_blocks_and_transactions')
 cli.add_command(export_tokens, 'export_tokens')

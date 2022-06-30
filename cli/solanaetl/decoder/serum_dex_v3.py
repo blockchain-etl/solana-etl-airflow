@@ -17,10 +17,13 @@
 
 
 import enum
+import sys
 from typing import Any, Callable
 
+from solanaetl.decoder.buffer_layout import (iter_blob, sint, u8, u16, u32,
+                                             u64, u128)
 from solanaetl.decoder.program_decoder import ProgramDecoder
-from solanaetl.decoder.buffer_layout import sint, u8, u16, u32, u64, u128
+from solanaetl.domain.instruction import Instruction
 from solanaetl.utils import safe_get
 
 # See: https://github.com/project-serum/serum-dex/blob/master/dex/src/instruction.rs
@@ -182,7 +185,7 @@ class SerumDexV3ProgramDecoder(ProgramDecoder):
                 'order_type': u32,
                 'client_id': u64,
                 'limit': u16,
-                'max_ts': lambda data, offset: sint(data, 8, offset),
+                'max_ts': lambda data, offset: sint(data, 8, offset) if len(data) == 58 else (sys.maxsize, offset),
                 'market': lambda accounts: safe_get(accounts, 0),
                 'open_orders': lambda accounts: safe_get(accounts, 1),
                 'request_queue': lambda accounts: safe_get(accounts, 2),
@@ -266,7 +269,7 @@ class SerumDexV3ProgramDecoder(ProgramDecoder):
                 'crank_authority': lambda accounts: safe_get(accounts, len(accounts) - 1),
             },
             SerumDexV3Instruction.cancelOrdersByClientIds.value: {
-                # TODO: chunk client_ids
+                'client_ids': lambda data, offset: iter_blob(data, u64, n_items=len(data) // 8, offset=offset),
                 'market': lambda accounts: safe_get(accounts, 0),
                 'bids': lambda accounts: safe_get(accounts, 1),
                 'asks': lambda accounts: safe_get(accounts, 2),
@@ -316,6 +319,6 @@ class SerumDexV3ProgramDecoder(ProgramDecoder):
             },
         }
 
-    def decode(self, data: str = None, accounts: list[str] = []) -> dict[str, object]:
+    def decode(self, instruction: Instruction) -> dict[str, object]:
         # the first bytes is versioned bytes
-        return super().decode(data, accounts, initial_offset=1)
+        return super().decode(instruction, initial_offset=1)

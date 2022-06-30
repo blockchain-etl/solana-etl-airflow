@@ -21,6 +21,17 @@ Environment:
 
 ---
 
+Export all
+
+```bash
+> solanaetl export_all \
+    --start 138802069 \
+    --end 138802069 \
+    --output-dir=./output
+```
+
+---
+
 Export blocks and transactions (include input accounts, instructions):
 
 ```bash

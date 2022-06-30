@@ -16,6 +16,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+from typing import Any, Callable
 from base58 import b58encode
 
 V2E32 = pow(2, 32)
@@ -70,3 +71,13 @@ def blob(data: bytes, n_bytes: int, offset: int = 0) -> tuple[bytes, int]:
 def public_key(data: bytes, offset: int = 0) -> tuple[str, int]:
     public_key_bytes, next_offset = blob(data, 32, offset)
     return b58encode(public_key_bytes).decode("utf-8"), next_offset
+
+
+def iter_blob(data: bytes, item_handler: Callable, n_items: int, offset: int = 0) -> tuple[list, int]:
+    results = []
+    next_offset = offset
+    for i in range(n_items):
+        decoded_data, next_offset = item_handler(data, next_offset)
+        results.append(decoded_data)
+
+    return results, next_offset

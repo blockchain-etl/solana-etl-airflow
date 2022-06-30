@@ -23,6 +23,8 @@ from typing import Any, Callable
 
 from base58 import b58decode
 
+from solanaetl.domain.instruction import Instruction
+
 
 class ProgramDecoder(object):
     def __init__(self, name: str, can_decode=False) -> None:
@@ -51,10 +53,13 @@ class ProgramDecoder(object):
         """
         raise NotImplementedError
 
-    def decode(self, data: str = None, accounts: list[str] = [], initial_offset: int = 0) -> tuple[str, dict[str, object]]:
+    def decode(self, instruction: Instruction, initial_offset: int = 0) -> tuple[str, dict[str, object]]:
         """
         :return: instruction name, decoded params
         """
+        data = instruction.data
+        accounts = instruction.accounts
+
         if self.can_decode is False or data is None:
             return 'unspecified', {}
 
@@ -84,6 +89,6 @@ class ProgramDecoder(object):
 
         if offset != len(data_bytes):
             logging.warning(
-                f"Decoded data of intruction {self.instruction(discrim)} of {self.name} not fit to original data\texpected = {len(data_bytes)}\tactual = {offset}")
+                f"Decoded data of intruction {self.instruction(discrim)} of {self.name} not fit to original data\texpected={len(data_bytes)}\tactual={offset}\ttx={instruction.tx_signature}")
 
         return self.instruction(discrim), decoded_params
