@@ -53,7 +53,7 @@ class SerumDexV3Instruction(enum.Enum):
 class SerumDexV3ProgramDecoder(ProgramDecoder):
 
     def __init__(self) -> None:
-        super().__init__('serum-dex-v3')
+        super().__init__('serum-dex-v3', can_decode=True)
 
     def discrim(self) -> Callable[[bytes, int], tuple[int, int]]:
         return lambda data, offset: u32(data, offset)

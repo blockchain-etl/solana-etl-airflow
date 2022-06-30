@@ -25,8 +25,9 @@ from base58 import b58decode
 
 
 class ProgramDecoder(object):
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, can_decode=False) -> None:
         self.name = name
+        self.can_decode = can_decode
 
     @abstractmethod
     def discrim(self) -> Callable[[bytes, int], tuple[int, int]]:
