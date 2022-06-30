@@ -23,7 +23,8 @@ from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.mappers.instruction_mapper import InstructionMapper
 from solanaetl.mappers.token_transfer_mapper import TokenTransferMapper
 from solanaetl.providers.batch import BatchProvider
-from solanaetl.services.token_transfer_extractor import TokenTransferExtractor
+from solanaetl.services.token_transfer_extractor import \
+    extract_transfer_from_instruction
 
 
 class ExtractTokenTransfersJob(BaseJob):
@@ -42,7 +43,6 @@ class ExtractTokenTransfersJob(BaseJob):
 
         self.instruction_mapper = InstructionMapper()
         self.token_transfer_mapper = TokenTransferMapper()
-        self.token_transfer_extractor = TokenTransferExtractor()
 
     def _start(self):
         self.item_exporter.open()
@@ -56,13 +56,13 @@ class ExtractTokenTransfersJob(BaseJob):
             self._extract_transfer(instruction_dict)
 
     def _extract_transfer(self, instruction_dict):
-        instruction = self.instruction_mapper.dict_to_instruction(
+        instruction = self.instruction_mapper.from_dict(
             instruction_dict)
-        token_transfer = self.token_transfer_extractor.extract_transfer_from_instruction(
+        token_transfer = extract_transfer_from_instruction(
             instruction)
         if token_transfer is not None:
             self.item_exporter.export_item(
-                self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
+                self.token_transfer_mapper.to_dict(token_transfer))
 
     def _end(self):
         self.batch_work_executor.shutdown()

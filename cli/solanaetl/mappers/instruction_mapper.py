@@ -21,7 +21,7 @@ from solanaetl.domain.instruction import Instruction
 
 
 class InstructionMapper(object):
-    def json_dict_to_instruction(self, json_dict: dict, tx_signature: str, index: int, parent_index: int = None):
+    def from_json_dict(self, json_dict: dict, tx_signature: str, index: int, parent_index: int = None) -> Instruction:
         instruction = Instruction()
         instruction.tx_signature = tx_signature
         instruction.index = index
@@ -41,8 +41,7 @@ class InstructionMapper(object):
 
         return instruction
 
-    # TODO: should change function name become to_dict or make it static and register to init
-    def instruction_to_dict(self, instruction: Instruction):
+    def to_dict(self, instruction: Instruction) -> dict:
         return {
             'type': 'instruction',
             'tx_signature': instruction.tx_signature,
@@ -56,8 +55,7 @@ class InstructionMapper(object):
             'params': json.dumps(instruction.params),
         }
 
-    # TODO: should change function static and register to init
-    def dict_to_instruction(self, dict: dict):
+    def from_dict(self, dict: dict) -> Instruction:
         instruction = Instruction()
 
         instruction.tx_signature = dict.get('tx_signature')

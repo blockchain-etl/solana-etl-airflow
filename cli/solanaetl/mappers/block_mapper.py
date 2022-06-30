@@ -29,7 +29,7 @@ class BlockMapper(object):
         else:
             self.transaction_mapper = transaction_mapper
 
-    def json_dict_to_block(self, json_dict):
+    def from_json_dict(self, json_dict) -> Block:
         block = Block()
         block.number = int(json_dict.get('parentSlot')) + 1
         block.hash = json_dict.get('blockhash')
@@ -48,7 +48,7 @@ class BlockMapper(object):
 
         if 'transactions' in json_dict:
             block.transactions = [
-                self.transaction_mapper.json_dict_to_transaction(
+                self.transaction_mapper.from_json_dict(
                     tx,
                     block_timestamp=block.timestamp,
                     block_number=block.number,
@@ -63,8 +63,7 @@ class BlockMapper(object):
 
         return block
 
-    # TODO: should change function name become to_dict or make it static and register to init
-    def block_to_dict(self, block: Block):
+    def to_dict(self, block: Block) -> dict:
         return {
             'type': 'block',
             'number': block.number,

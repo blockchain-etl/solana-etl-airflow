@@ -16,10 +16,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import logging
-from inspect import isfunction, signature
-from typing import Any
-
 from base58 import b58encode
 
 V2E32 = pow(2, 32)
@@ -30,11 +26,13 @@ def rounded_int64(hi32, lo32):
 
 
 def sint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
+    """signed int"""
     data_bytes, offset = blob(data, n_bytes, offset)
     return int.from_bytes(data_bytes, byteorder="little", signed=True), offset
 
 
 def uint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
+    """unsigned int"""
     data_bytes, offset = blob(data, n_bytes, offset)
     return int.from_bytes(data_bytes, byteorder="little"), offset
 
@@ -72,23 +70,3 @@ def blob(data: bytes, n_bytes: int, offset: int = 0) -> tuple[bytes, int]:
 def public_key(data: bytes, offset: int = 0) -> tuple[str, int]:
     public_key_bytes, next_offset = blob(data, 32, offset)
     return b58encode(public_key_bytes).decode("utf-8"), next_offset
-
-
-def decode_params(data: bytes, decoding_params: dict[int, dict[str, Any]], func_index: int, program='unspecified') -> dict[str, object]:
-    offset = 0
-    decoded_params = {}
-    for property, handler in decoding_params.get(func_index).items():
-        if isfunction(handler):
-            params = signature(handler).parameters
-            if len(params) == 2:
-                decoded_params[property], offset = handler(data, offset)
-            else:
-                decoded_params[property] = handler()
-        else:
-            decoded_params[property] = handler
-
-    if offset != len(data):
-        logging.warning(
-            f"Decoded data of intruction {func_index} of {program} not fit to original data\texpected = {len(data)}\tactual = {offset}")
-
-    return decoded_params

@@ -29,7 +29,7 @@ class TransactionMapper(object):
         self.instruction_mapper = instruction_mapper if instruction_mapper is not None else InstructionMapper()
         self.account_mapper = account_mapper if account_mapper is not None else AccountMapper()
 
-    def json_dict_to_transaction(self, json_dict: dict, **kwargs):
+    def from_json_dict(self, json_dict: dict, **kwargs) -> Transaction:
         transaction = Transaction()
 
         transaction.block_hash = kwargs.get('block_hash')
@@ -46,7 +46,7 @@ class TransactionMapper(object):
 
             if 'instructions' in tx_json.get('message'):
                 instructions.extend([
-                    self.instruction_mapper.json_dict_to_instruction(
+                    self.instruction_mapper.from_json_dict(
                         instruction, tx_signature=transaction.signature, index=index)
                     for index, instruction in enumerate(tx_json.get('message').get('instructions'))
                 ])
@@ -61,7 +61,7 @@ class TransactionMapper(object):
 
             if 'innerInstructions' in tx_meta_json:
                 instructions.extend([
-                    self.instruction_mapper.json_dict_to_instruction(
+                    self.instruction_mapper.from_json_dict(
                         instruction, tx_signature=transaction.signature, index=index, parent_index=inner_instruction.get('index'))
                     for inner_instruction in tx_meta_json.get('innerInstructions')
                     for index, instruction in enumerate(inner_instruction.get('instructions'))
@@ -97,7 +97,6 @@ class TransactionMapper(object):
 
         return transaction
 
-    # TODO: should change function static and register to init
     def balance_change_to_dict(self, balance_change: BalanceChange):
         return {
             'account': balance_change.account,
@@ -105,8 +104,7 @@ class TransactionMapper(object):
             'after': balance_change.after,
         }
 
-    # TODO: should change function static and register to init
-    def transaction_to_dict(self, transaction: Transaction):
+    def to_dict(self, transaction: Transaction) -> dict:
         return {
             'type': 'transaction',
             'signature': transaction.signature,
@@ -127,8 +125,7 @@ class TransactionMapper(object):
             'post_token_balances': json.dumps(transaction.post_token_balances),
         }
 
-    # TODO: should change function name become to_dict or make it static and register to init
-    def dict_to_transaction(self, dict: dict):
+    def from_dict(self, dict: dict) -> Transaction:
         transaction = Transaction()
 
         transaction.signature = dict.get('signature')

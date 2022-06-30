@@ -59,7 +59,7 @@ class ExportInstructionsJob(BaseJob):
         response = self.batch_web3_provider.make_batch_request(
             json.dumps(transactions_rpc))
         results = rpc_response_batch_to_results(response)
-        transactions = [self.transaction_mapper.json_dict_to_transaction(
+        transactions = [self.transaction_mapper.from_json_dict(
             result) for result in results]
 
         for transaction in transactions:
@@ -68,7 +68,7 @@ class ExportInstructionsJob(BaseJob):
     def _export_instructions_in_transaction(self, transaction: Transaction):
         for instruction in transaction.instructions:
             instruction = self.instruction_parser.parse(instruction)
-            instruction_dict = self.instruction_mapper.instruction_to_dict(
+            instruction_dict = self.instruction_mapper.to_dict(
                 instruction)
             self.item_exporter.export_item(instruction_dict)
 

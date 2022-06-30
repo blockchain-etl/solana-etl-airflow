@@ -16,17 +16,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from solanaetl.domain.token_transfer import TokenTransfer
+from solanaetl.decoder.program_decoder import ProgramDecoder
 
 
-class TokenTransferMapper(object):
-
-    def to_dict(self, token_transfer: TokenTransfer) -> dict:
-        return {
-            'type': 'token_transfer',
-            'source': token_transfer.source,
-            'destination': token_transfer.destination,
-            'authority': token_transfer.authority,
-            'value': token_transfer.value,
-            'tx_signature': token_transfer.tx_signature,
-        }
+class MangoMarketsV3ProgramDecoder(ProgramDecoder):
+    def __init__(self) -> None:
+        super().__init__('mango-markets-v3')

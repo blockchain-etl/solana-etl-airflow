@@ -21,7 +21,7 @@ from solanaetl.domain.account import Account
 
 
 class AccountMapper(object):
-    def json_dict_to_account(self, json_dict: dict, accountKey: str = None):
+    def from_json_dict(self, json_dict: dict, accountKey: str = None) -> Account:
         account = Account()
         account.pubkey = accountKey
         account.executable = json_dict.get('executable')
@@ -79,13 +79,13 @@ class AccountMapper(object):
 
         return account
 
-    def account_to_dict(self, account: Account):
+    def to_dict(self, account: Account) -> dict:
         return {
             'type': 'account',
             'pubkey': account.pubkey,
             'executable': account.executable,
             'lamports': account.lamports,
-            # 'owner': account.owner, TODO: duplicate owner
+            'owner': account.owner,
             'rent_epoch': account.rent_epoch,
             'program': account.program,
             'space': account.space,
@@ -108,8 +108,7 @@ class AccountMapper(object):
             'data': account.data,
         }
 
-    # TODO: should change function name become to_dict or make it static and register to init
-    def dict_to_account(self, dict: dict) -> Account:
+    def from_dict(self, dict: dict) -> Account:
         account = Account()
 
         account.pubkey = dict.get('pubkey')

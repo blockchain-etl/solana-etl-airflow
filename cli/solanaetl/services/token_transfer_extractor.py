@@ -24,23 +24,22 @@ TOKEN_PROGRAM = 'spl-token'
 SYSTEM_PROGRAM = 'system'
 INSTRUCTION_TYPE = 'transfer'
 
-#  TODO No need class here
-class TokenTransferExtractor(object):
-    def extract_transfer_from_instruction(self, instruction: Instruction) -> TokenTransfer:
-        token_transfer = TokenTransfer()
 
-        if instruction.program == TOKEN_PROGRAM and instruction.instruction_type == INSTRUCTION_TYPE:
-            token_transfer.value = instruction.params.get('amount')
-            token_transfer.source = instruction.params.get('source')
-            token_transfer.destination = instruction.params.get('destination')
-            token_transfer.authority = instruction.params.get('authority')
-        elif instruction.program == SYSTEM_PROGRAM and instruction.instruction_type == INSTRUCTION_TYPE:
-            token_transfer.value = instruction.params.get('lamports')
-            token_transfer.source = instruction.params.get('source')
-            token_transfer.destination = instruction.params.get('destination')
-        else:
-            return None
+def extract_transfer_from_instruction(instruction: Instruction) -> TokenTransfer:
+    token_transfer = TokenTransfer()
 
-        token_transfer.tx_signature = instruction.tx_signature
+    if instruction.program == TOKEN_PROGRAM and instruction.instruction_type == INSTRUCTION_TYPE:
+        token_transfer.value = instruction.params.get('amount')
+        token_transfer.source = instruction.params.get('source')
+        token_transfer.destination = instruction.params.get('destination')
+        token_transfer.authority = instruction.params.get('authority')
+    elif instruction.program == SYSTEM_PROGRAM and instruction.instruction_type == INSTRUCTION_TYPE:
+        token_transfer.value = instruction.params.get('lamports')
+        token_transfer.source = instruction.params.get('source')
+        token_transfer.destination = instruction.params.get('destination')
+    else:
+        return None
 
-        return token_transfer
+    token_transfer.tx_signature = instruction.tx_signature
+
+    return token_transfer
