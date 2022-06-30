@@ -25,8 +25,8 @@ from solanaetl.utils import safe_get
 
 # See: https://github.com/project-serum/serum-dex/blob/master/dex/src/instruction.rs
 
-# TODO should rename to SerumDEXV3Instruction
-class Instruction(enum.Enum):
+
+class SerumDexV3Instruction(enum.Enum):
     initializeMarket = 0
     newOrder = 1
     matchOrders = 2
@@ -56,7 +56,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
     program_func_index, _ = u32(data_decoded)
     # TODO: Fill all params to decode
     decoding_params = {
-        Instruction.initializeMarket.value: {
+        SerumDexV3Instruction.initializeMarket.value: {
             'instruction': u32,
             'coin_lot_size': u64,
             'pc_lot_size': u64,
@@ -77,7 +77,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'prune_authority': lambda: safe_get(accounts, 11),
             'crank_authority': lambda: safe_get(accounts, 12),
         },
-        Instruction.newOrder.value: {
+        SerumDexV3Instruction.newOrder.value: {
             'instruction': u32,
             'side': u32,
             'limit_price': u64,
@@ -95,7 +95,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'rent_sysvar': lambda: safe_get(accounts, 8),
             'srm': lambda: safe_get(accounts, 9),
         },
-        Instruction.matchOrders.value: {
+        SerumDexV3Instruction.matchOrders.value: {
             'instruction': u32,
             'limit': u16,
             'market': lambda: safe_get(accounts, 0),
@@ -104,14 +104,14 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'bids': lambda: safe_get(accounts, 3),
             'asks': lambda: safe_get(accounts, 4),
         },
-        Instruction.consumeEvents.value: {
+        SerumDexV3Instruction.consumeEvents.value: {
             'instruction': u32,
             'limit': u16,
             'open_orders': lambda: sorted(list(set(accounts))),
             'market': lambda: safe_get(accounts, len(accounts) - 4),
             'event_queue': lambda: safe_get(accounts, len(accounts) - 3),
         },
-        Instruction.cancelOrder.value: {
+        SerumDexV3Instruction.cancelOrder.value: {
             'instruction': u32,
             'side': u32,
             'order_id': u128,
@@ -122,7 +122,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'request_queue': lambda: safe_get(accounts, 2),
             'open_orders_owner': lambda: safe_get(accounts, 3),
         },
-        Instruction.settleFunds.value: {
+        SerumDexV3Instruction.settleFunds.value: {
             'instruction': u32,
             'market': lambda: safe_get(accounts, 0),
             'open_orders': lambda: safe_get(accounts, 1),
@@ -135,7 +135,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'token_program': lambda: safe_get(accounts, 8),
             'ref_pc_wallet': lambda: safe_get(accounts, 9),
         },
-        Instruction.cancelOrderByClientId.value: {
+        SerumDexV3Instruction.cancelOrderByClientId.value: {
             'instruction': u32,
             'client_id': u64,
             'market': lambda: safe_get(accounts, 0),
@@ -143,12 +143,12 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'request_queue': lambda: safe_get(accounts, 2),
             'open_orders_owner': lambda: safe_get(accounts, 3),
         },
-        Instruction.disableMarket.value: {
+        SerumDexV3Instruction.disableMarket.value: {
             'instruction': u32,
             'market': lambda: safe_get(accounts, 0),
             'disable_authority': lambda: safe_get(accounts, 1),
         },
-        Instruction.sweepFees.value: {
+        SerumDexV3Instruction.sweepFees.value: {
             'instruction': u32,
             'market': lambda: safe_get(accounts, 0),
             'pc_vault': lambda: safe_get(accounts, 1),
@@ -157,7 +157,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'vault_signer': lambda: safe_get(accounts, 4),
             'token_program': lambda: safe_get(accounts, 5),
         },
-        Instruction.newOrderV2.value: {
+        SerumDexV3Instruction.newOrderV2.value: {
             'instruction': u32,
             'side': u32,
             'limit_price': u64,
@@ -176,7 +176,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'rent_sysvar': lambda: safe_get(accounts, 8),
             'srm': lambda: safe_get(accounts, 9),
         },
-        Instruction.newOrderV3.value: {
+        SerumDexV3Instruction.newOrderV3.value: {
             'instruction': u32,
             'side': u32,
             'limit_price': u64,
@@ -198,7 +198,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'rent_sysvar': lambda: safe_get(accounts, 8),
             'srm': lambda: safe_get(accounts, 9),
         },
-        Instruction.cancelOrderV2.value: {
+        SerumDexV3Instruction.cancelOrderV2.value: {
             'instruction': u32,
             'side': u32,
             'order_id': u128,
@@ -209,7 +209,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'owner': lambda: safe_get(accounts, 4),
             'event_queue': lambda: safe_get(accounts, 5),
         },
-        Instruction.cancelOrderByClientIdV2.value: {
+        SerumDexV3Instruction.cancelOrderByClientIdV2.value: {
             'instruction': u32,
             'client_id': u64,
             'market': lambda: safe_get(accounts, 0),
@@ -219,7 +219,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'owner': lambda: safe_get(accounts, 4),
             'event_queue': lambda: safe_get(accounts, 5),
         },
-        Instruction.sendTake.value: {
+        SerumDexV3Instruction.sendTake.value: {
             'instruction': u32,
             'side': u32,
             'limit_price': u64,
@@ -241,13 +241,13 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'token_program': lambda: safe_get(accounts, 10),
             'srm': lambda: safe_get(accounts, 11),
         },
-        Instruction.closeOpenOrders.value: {
+        SerumDexV3Instruction.closeOpenOrders.value: {
             'instruction': u32,
             'open_orders': lambda: safe_get(accounts, 0),
             'open_opders_owner': lambda: safe_get(accounts, 1),
             'market': lambda: safe_get(accounts, 2),
         },
-        Instruction.initOpenOrders.value: {
+        SerumDexV3Instruction.initOpenOrders.value: {
             'instruction': u32,
             'market': lambda: safe_get(accounts, 0),
             'bids': lambda: safe_get(accounts, 1),
@@ -257,7 +257,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'open_opders_owner': lambda: safe_get(accounts, 5),
             'event_queue': lambda: safe_get(accounts, 6),
         },
-        Instruction.prune.value: {
+        SerumDexV3Instruction.prune.value: {
             'instruction': u32,
             'limit': u16,
             'market': lambda: safe_get(accounts, 0),
@@ -268,7 +268,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'open_opders_owner': lambda: safe_get(accounts, 5),
             'event_queue': lambda: safe_get(accounts, 6),
         },
-        Instruction.consumeEventsPermissioned.value: {
+        SerumDexV3Instruction.consumeEventsPermissioned.value: {
             'instruction': u32,
             'limit': u16,
             'open_orders': lambda: sorted(list(set(accounts))),
@@ -276,7 +276,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'event_queue': lambda: safe_get(accounts, len(accounts) - 2),
             'crank_authority': lambda: safe_get(accounts, len(accounts) - 1),
         },
-        Instruction.cancelOrdersByClientIds.value: {
+        SerumDexV3Instruction.cancelOrdersByClientIds.value: {
             'instruction': u32,
             # TODO: chunk client_ids
             'market': lambda: safe_get(accounts, 0),
@@ -286,7 +286,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'open_opders_owner': lambda: safe_get(accounts, 4),
             'event_queue': lambda: safe_get(accounts, 5),
         },
-        Instruction.replaceOrderByClientId.value: {
+        SerumDexV3Instruction.replaceOrderByClientId.value: {
             'instruction': u32,
             'side': u32,
             'limit_price': u64,
@@ -311,7 +311,7 @@ def decode(data: str, accounts: list[str] = []) -> dict[str, object]:
             'rent_sysvar': lambda: safe_get(accounts, 11),
             'srm': lambda: safe_get(accounts, 12),
         },
-        Instruction.replaceOrdersByClientIds.value: {
+        SerumDexV3Instruction.replaceOrdersByClientIds.value: {
             'instruction': u32,
             # TODO: chunk new_orders
             'market': lambda: safe_get(accounts, 0),

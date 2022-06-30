@@ -26,7 +26,7 @@ from tests.helpers import (compare_lines_ignore_order, read_file,
                            skip_if_slow_tests_disabled)
 from tests.solanaetl.job.helpers import get_web3_provider
 
-RESOURCE_GROUP = "test_export_blocks_job"
+RESOURCE_GROUP = 'test_export_blocks_job'
 
 
 def read_resource(resource_group, file_name):
@@ -34,18 +34,18 @@ def read_resource(resource_group, file_name):
 
 
 @pytest.mark.parametrize(
-    "start_block,end_block,batch_size,resource_group,web3_provider_type",
+    'start_block,end_block,batch_size,resource_group,web3_provider_type',
     [
-        (138802069, 138802069, 1, "blocks_only", "mock"),
+        (138802069, 138802069, 1, 'blocks_only', 'mock'),
         skip_if_slow_tests_disabled(
-            (138802069, 138802069, 1, "blocks_only", "online"),
+            (138802069, 138802069, 1, 'blocks_only', 'online'),
         )
     ],
 )
 def test_export_blocks_job_blocks_only(
     tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type
 ):
-    blocks_output_file = str(tmpdir.join("actual_blocks.csv"))
+    blocks_output_file = str(tmpdir.join('actual_blocks.csv'))
 
     job = ExportBlocksJob(
         start_block=start_block,
@@ -69,25 +69,25 @@ def test_export_blocks_job_blocks_only(
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, "expected_blocks.csv"),
+        read_resource(resource_group, 'expected_blocks.csv'),
         read_file(blocks_output_file),
     )
 
 
 @pytest.mark.parametrize(
-    "start_block,end_block,batch_size,resource_group,web3_provider_type",
+    'start_block,end_block,batch_size,resource_group,web3_provider_type',
     [
-        (138802069, 138802069, 1, "blocks_with_transactions", "mock"),
+        (138802069, 138802069, 1, 'blocks_with_transactions', 'mock'),
         skip_if_slow_tests_disabled(
-            (138802069, 138802069, 1, "blocks_with_transactions", "online"),
+            (138802069, 138802069, 1, 'blocks_with_transactions', 'online'),
         )
     ],
 )
 def test_export_blocks_job_with_transactions(
     tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type
 ):
-    blocks_output_file = str(tmpdir.join("actual_blocks.csv"))
-    transactions_output_file = str(tmpdir.join("actual_transactions.csv"))
+    blocks_output_file = str(tmpdir.join('actual_blocks.csv'))
+    transactions_output_file = str(tmpdir.join('actual_transactions.csv'))
 
     job = ExportBlocksJob(
         start_block=start_block,
@@ -112,32 +112,32 @@ def test_export_blocks_job_with_transactions(
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, "expected_blocks.csv"),
+        read_resource(resource_group, 'expected_blocks.csv'),
         read_file(blocks_output_file),
     )
 
     compare_lines_ignore_order(
-        read_resource(resource_group, "expected_transactions.csv"),
+        read_resource(resource_group, 'expected_transactions.csv'),
         read_file(transactions_output_file),
     )
 
 
 @pytest.mark.parametrize(
-    "start_block,end_block,batch_size,resource_group,web3_provider_type",
+    'start_block,end_block,batch_size,resource_group,web3_provider_type',
     [
-        (138802069, 138802069, 1, "blocks_with_transactions_and_instructions", "mock"),
+        (138802069, 138802069, 1, 'blocks_with_transactions_and_instructions', 'mock'),
         skip_if_slow_tests_disabled(
             (138802069, 138802069, 1,
-             "blocks_with_transactions_and_instructions", "online"),
+             'blocks_with_transactions_and_instructions', 'online'),
         )
     ],
 )
 def test_export_blocks_job_with_transactions_and_instructions(
     tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type
 ):
-    blocks_output_file = str(tmpdir.join("actual_blocks.csv"))
-    transactions_output_file = str(tmpdir.join("actual_transactions.csv"))
-    instructions_output_file = str(tmpdir.join("actual_instructions.csv"))
+    blocks_output_file = str(tmpdir.join('actual_blocks.csv'))
+    transactions_output_file = str(tmpdir.join('actual_transactions.csv'))
+    instructions_output_file = str(tmpdir.join('actual_instructions.csv'))
 
     job = ExportBlocksJob(
         start_block=start_block,
@@ -163,16 +163,16 @@ def test_export_blocks_job_with_transactions_and_instructions(
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, "expected_blocks.csv"),
+        read_resource(resource_group, 'expected_blocks.csv'),
         read_file(blocks_output_file),
     )
 
     compare_lines_ignore_order(
-        read_resource(resource_group, "expected_transactions.csv"),
+        read_resource(resource_group, 'expected_transactions.csv'),
         read_file(transactions_output_file),
     )
 
     compare_lines_ignore_order(
-        read_resource(resource_group, "expected_instructions.csv"),
+        read_resource(resource_group, 'expected_instructions.csv'),
         read_file(instructions_output_file),
     )

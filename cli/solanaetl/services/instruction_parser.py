@@ -30,7 +30,7 @@ class InstructionParser(object):
             instruction.program = 'serum-dex-v3'
             instruction.params = serum_dex_v3_program.decode(
                 data=instruction.data, accounts=instruction.accounts)
-            instruction.instruction_type = serum_dex_v3_program.Instruction(
+            instruction.instruction_type = serum_dex_v3_program.SerumDexV3Instruction(
                 instruction.params.get('instruction')).name
 
         if 'instruction' in instruction.params:
