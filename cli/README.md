@@ -7,6 +7,7 @@ Solana ETL lets you convert blockchain data into convenient formats like CSVs an
 Install Solana ETL CLI:
 
 ```bash
+cd cli
 python setup.py install
 ```
 

@@ -97,6 +97,7 @@ class TransactionMapper(object):
 
         return transaction
 
+    # TODO: should change function static and register to init
     def balance_change_to_dict(self, balance_change: BalanceChange):
         return {
             'account': balance_change.account,
@@ -104,6 +105,7 @@ class TransactionMapper(object):
             'after': balance_change.after,
         }
 
+    # TODO: should change function static and register to init
     def transaction_to_dict(self, transaction: Transaction):
         return {
             'type': 'transaction',
@@ -125,6 +127,7 @@ class TransactionMapper(object):
             'post_token_balances': json.dumps(transaction.post_token_balances),
         }
 
+    # TODO: should change function name become to_dict or make it static and register to init
     def dict_to_transaction(self, dict: dict):
         transaction = Transaction()
 

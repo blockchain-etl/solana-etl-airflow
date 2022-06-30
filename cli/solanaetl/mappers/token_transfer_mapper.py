@@ -20,6 +20,8 @@ from solanaetl.domain.token_transfer import TokenTransfer
 
 
 class TokenTransferMapper(object):
+    
+    # TODO: should change function name become to_dict or make it static and register to init
     def token_transfer_to_dict(self, token_transfer: TokenTransfer):
         return {
             'type': 'token_transfer',

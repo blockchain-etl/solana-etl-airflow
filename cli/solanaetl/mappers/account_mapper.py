@@ -85,7 +85,7 @@ class AccountMapper(object):
             'pubkey': account.pubkey,
             'executable': account.executable,
             'lamports': account.lamports,
-            'owner': account.owner,
+            # 'owner': account.owner, TODO: duplicate owner
             'rent_epoch': account.rent_epoch,
             'program': account.program,
             'space': account.space,
@@ -109,6 +109,7 @@ class AccountMapper(object):
             'data': account.data,
         }
 
+    # TODO: should change function name become to_dict or make it static and register to init
     def dict_to_account(self, dict: dict) -> Account:
         account = Account()
 

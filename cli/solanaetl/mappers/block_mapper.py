@@ -63,6 +63,7 @@ class BlockMapper(object):
 
         return block
 
+    # TODO: should change function name become to_dict or make it static and register to init
     def block_to_dict(self, block: Block):
         return {
             'type': 'block',

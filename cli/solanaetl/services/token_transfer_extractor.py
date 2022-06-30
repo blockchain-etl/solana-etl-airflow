@@ -24,7 +24,7 @@ TOKEN_PROGRAM = 'spl-token'
 SYSTEM_PROGRAM = 'system'
 INSTRUCTION_TYPE = 'transfer'
 
-
+#  TODO No need class here
 class TokenTransferExtractor(object):
     def extract_transfer_from_instruction(self, instruction: Instruction) -> TokenTransfer:
         token_transfer = TokenTransfer()

@@ -25,7 +25,7 @@ from solanaetl.utils import safe_get
 
 # See: https://github.com/project-serum/serum-dex/blob/master/dex/src/instruction.rs
 
-
+# TODO should rename to SerumDEXV3Instruction
 class Instruction(enum.Enum):
     initializeMarket = 0
     newOrder = 1

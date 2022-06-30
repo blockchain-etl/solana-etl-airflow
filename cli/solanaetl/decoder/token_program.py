@@ -23,7 +23,7 @@ from solanaetl.decoder.utils import decode_params, u8, u64
 
 # See: https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs
 
-
+# TODO remove use
 def decode(data: str) -> Dict[str, object]:
     data_decoded = b58decode(data.encode())
     program_func_index, _ = u8(data_decoded)

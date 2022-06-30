@@ -23,7 +23,7 @@ from solanaetl.domain.instruction import Instruction
 SERUM_DEX_V3 = os.getenv(
     'SERUM_DEX_V3', '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin')
 
-
+# TODO: should restructure for easy to register custom program.
 class InstructionParser(object):
     def parse(self, instruction: Instruction):
         if instruction.program_id == SERUM_DEX_V3:

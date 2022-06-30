@@ -21,9 +21,10 @@ from typing import Dict
 from base58 import b58decode
 from solanaetl.decoder.utils import decode_params, ns64, public_key, u32, u64
 
+
 # See: https://docs.rs/solana-program/latest/src/solana_program/system_instruction.rs.html
 
-
+# TODO remove use
 def decode(data: str) -> Dict[str, object]:
     data_decoded = b58decode(data.encode())
     program_func_index, _ = u32(data_decoded)

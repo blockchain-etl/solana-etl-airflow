@@ -41,6 +41,7 @@ class InstructionMapper(object):
 
         return instruction
 
+    # TODO: should change function name become to_dict or make it static and register to init
     def instruction_to_dict(self, instruction: Instruction):
         return {
             'type': 'instruction',
@@ -55,6 +56,7 @@ class InstructionMapper(object):
             'params': json.dumps(instruction.params),
         }
 
+    # TODO: should change function static and register to init
     def dict_to_instruction(self, dict: dict):
         instruction = Instruction()
 
