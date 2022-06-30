@@ -28,7 +28,7 @@ try:
 except ImportError:
     JSONDecodeError = ValueError
 
-
+# TODO Does solana support IPC provider??? If not just remove unused
 # Mostly copied from web3.py/providers/ipc.py. Supports batch requests.
 # Will be removed once batch feature is added to web3.py https://github.com/ethereum/web3.py/issues/832
 # Also see this optimization https://github.com/ethereum/web3.py/pull/849

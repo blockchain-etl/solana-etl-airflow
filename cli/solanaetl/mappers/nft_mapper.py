@@ -47,6 +47,7 @@ class NftMapper(object):
 
         return nft
 
+    # TODO: should change function name become to_dict or make it static and register to init
     def nft_to_dict(self, nft: Nft) -> dict:
         return {
             'type': 'nft',
