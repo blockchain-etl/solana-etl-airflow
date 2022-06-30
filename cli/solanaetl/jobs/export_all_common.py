@@ -22,9 +22,16 @@ import shutil
 from time import time
 
 from solanaetl.jobs.export_blocks_job import ExportBlocksJob
-from solanaetl.jobs.exporters.accounts_item_exporter import accounts_item_exporter
-from solanaetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
+from solanaetl.jobs.exporters.accounts_item_exporter import \
+    accounts_item_exporter
+from solanaetl.jobs.exporters.blocks_and_transactions_item_exporter import \
+    blocks_and_transactions_item_exporter
+from solanaetl.jobs.exporters.nfts_item_exporter import nfts_item_exporter
+from solanaetl.jobs.exporters.token_transfers_item_exporter import \
+    token_transfers_item_exporter
 from solanaetl.jobs.extract_accounts_job import ExtractAccountsJob
+from solanaetl.jobs.extract_nfts_job import ExtractNftsJob
+from solanaetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from solanaetl.providers.auto import get_provider_from_uri
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 from solanaetl.utils import get_item_iterable
@@ -140,6 +147,60 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 batch_size=batch_size,
                 max_workers=max_workers,
                 item_exporter=accounts_item_exporter(accounts_file))
+
+            job.run()
+
+        # # # token transfers # # #
+        token_transfers_output_dir = '{output_dir}/token_transfers{partition_dir}'.format(
+            output_dir=output_dir,
+            partition_dir=partition_dir
+        )
+        os.makedirs(os.path.dirname(token_transfers_output_dir), exist_ok=True)
+
+        token_transfers_file = '{token_transfers_output_dir}/token_transfers_{file_name_suffix}.csv'.format(
+            token_transfers_output_dir=token_transfers_output_dir,
+            file_name_suffix=file_name_suffix,
+        )
+
+        logger.info('Exporting token transfers from blocks {block_range} to {token_transfers_file}'.format(
+            block_range=block_range,
+            token_transfers_file=token_transfers_file,
+        ))
+
+        with get_item_iterable(instructions_file) as instructions_reader:
+            job = ExtractTokenTransfersJob(
+                instructions_iterable=instructions_reader,
+                batch_size=batch_size,
+                max_workers=max_workers,
+                item_exporter=token_transfers_item_exporter(token_transfers_file))
+
+            job.run()
+
+        # # # nfts # # #
+        nfts_output_dir = '{output_dir}/nfts{partition_dir}'.format(
+            output_dir=output_dir,
+            partition_dir=partition_dir
+        )
+        os.makedirs(os.path.dirname(nfts_output_dir), exist_ok=True)
+
+        nfts_file = '{nfts_output_dir}/nfts_{file_name_suffix}.csv'.format(
+            nfts_output_dir=nfts_output_dir,
+            file_name_suffix=file_name_suffix,
+        )
+
+        logger.info('Exporting nfts from blocks {block_range} to {nfts_file}'.format(
+            block_range=block_range,
+            nfts_file=nfts_file,
+        ))
+
+        with get_item_iterable(accounts_file) as accounts_reader:
+            job = ExtractNftsJob(
+                batch_web3_provider=ThreadLocalProxy(
+                    lambda: get_provider_from_uri(provider_uri, batch=True)),
+                accounts_iterable=accounts_reader,
+                batch_size=batch_size,
+                max_workers=max_workers,
+                item_exporter=nfts_item_exporter(nfts_file))
 
             job.run()
 
