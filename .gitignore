@@ -164,3 +164,4 @@ cython_debug/
 cli/*.csv
 cli/*.txt
 cli/test.py
+output/
