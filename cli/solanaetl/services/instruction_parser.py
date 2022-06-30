@@ -41,8 +41,7 @@ class InstructionParser(object):
         if instruction.program_id in PROGRAM_DECODER:
             decoder = PROGRAM_DECODER.get(instruction.program_id)
             instruction.program = decoder.name
-            if decoder.can_decode:
-                instruction.instruction_type, instruction.params = decoder.decode(
-                    data=instruction.data, accounts=instruction.accounts)
+            instruction.instruction_type, instruction.params = decoder.decode(
+                data=instruction.data, accounts=instruction.accounts)
 
         return instruction

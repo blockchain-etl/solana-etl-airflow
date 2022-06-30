@@ -51,24 +51,29 @@ class ProgramDecoder(object):
         """
         raise NotImplementedError
 
-    def decode(self, b58_data: str, accounts: list[str] = [], initial_offset: int = 0) -> tuple[str, dict[str, object]]:
+    def decode(self, data: str = None, accounts: list[str] = [], initial_offset: int = 0) -> tuple[str, dict[str, object]]:
         """
         :return: instruction name, decoded params
         """
-        data = b58decode(b58_data.encode())
+        if self.can_decode is False or data is None:
+            return 'unspecified', {}
+
+        data_bytes = b58decode(data.encode())
+
         # some program have the first bytes is versioned bytes, we should remove them before decode
-        data = data[initial_offset:]
+        data_bytes = data_bytes[initial_offset:]
         # decoding params must be ordered and start from bytes 0
         offset = 0
         # decode instruction index
-        discrim, offset = self.discrim()(data, offset)
+        discrim, offset = self.discrim()(data_bytes, offset)
         decoded_params = {}
         for property, handler in self.params().get(discrim).items():
             if isfunction(handler):
                 params = signature(handler).parameters
                 if len(params) == 2:
                     # decode bytes buffer
-                    decoded_params[property], offset = handler(data, offset)
+                    decoded_params[property], offset = handler(
+                        data_bytes, offset)
                 elif len(params) == 1:
                     # decode accounts
                     decoded_params[property] = handler(accounts)
@@ -77,8 +82,8 @@ class ProgramDecoder(object):
             else:
                 decoded_params[property] = handler
 
-        if offset != len(data):
+        if offset != len(data_bytes):
             logging.warning(
-                f"Decoded data of intruction {self.instruction(discrim)} of {self.name} not fit to original data\texpected = {len(data)}\tactual = {offset}")
+                f"Decoded data of intruction {self.instruction(discrim)} of {self.name} not fit to original data\texpected = {len(data_bytes)}\tactual = {offset}")
 
         return self.instruction(discrim), decoded_params
