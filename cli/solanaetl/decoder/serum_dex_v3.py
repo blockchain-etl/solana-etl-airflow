@@ -18,7 +18,7 @@
 
 import enum
 import sys
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Tuple
 
 from solanaetl.decoder.buffer_layout import (iter_blob, sint, u8, u16, u32,
                                              u64, u128)
@@ -58,13 +58,13 @@ class SerumDexV3ProgramDecoder(ProgramDecoder):
     def __init__(self) -> None:
         super().__init__('serum-dex-v3', can_decode=True)
 
-    def discrim(self) -> Callable[[bytes, int], tuple[int, int]]:
+    def discrim(self) -> Callable[[bytes, int], Tuple[int, int]]:
         return lambda data, offset: u32(data, offset)
 
     def instruction(self, discrim: int) -> str:
         return SerumDexV3Instruction(discrim).name
 
-    def params(self) -> dict[int, dict[str, Any]]:
+    def params(self) -> Dict[int, Dict[str, Any]]:
         return {
             SerumDexV3Instruction.initializeMarket.value: {
                 'coin_lot_size': u64,
@@ -319,6 +319,6 @@ class SerumDexV3ProgramDecoder(ProgramDecoder):
             },
         }
 
-    def decode(self, instruction: Instruction) -> dict[str, object]:
+    def decode(self, instruction: Instruction) -> Dict[str, Any]:
         # the first bytes is versioned bytes
         return super().decode(instruction, initial_offset=1)

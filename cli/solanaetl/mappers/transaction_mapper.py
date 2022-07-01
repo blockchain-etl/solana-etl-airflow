@@ -17,6 +17,7 @@
 
 
 import json
+from typing import Dict, List
 
 from solanaetl.domain.instruction import Instruction
 from solanaetl.domain.transaction import BalanceChange, Transaction
@@ -29,15 +30,15 @@ class TransactionMapper(object):
         self.instruction_mapper = instruction_mapper if instruction_mapper is not None else InstructionMapper()
         self.account_mapper = account_mapper if account_mapper is not None else AccountMapper()
 
-    def from_json_dict(self, json_dict: dict, **kwargs) -> Transaction:
+    def from_json_dict(self, json_dict: Dict, **kwargs) -> Transaction:
         transaction = Transaction()
 
         transaction.block_hash = kwargs.get('block_hash')
         transaction.block_number = kwargs.get('block_number')
         transaction.block_timestamp = kwargs.get('block_timestamp')
 
-        tx_json: dict = json_dict.get('transaction')
-        instructions: list[Instruction] = []
+        tx_json: Dict = json_dict.get('transaction')
+        instructions: List[Instruction] = []
         if tx_json is not None:
             transaction.signature = tx_json.get('signatures')[0]
             transaction.accounts = tx_json.get('message').get('accountKeys')
@@ -52,7 +53,7 @@ class TransactionMapper(object):
                 ])
 
         # meta
-        tx_meta_json: dict = json_dict.get('meta')
+        tx_meta_json: Dict = json_dict.get('meta')
         if tx_meta_json is not None:
             transaction.fee = tx_meta_json.get('fee')
             tx_err = tx_meta_json.get('err')
@@ -70,7 +71,7 @@ class TransactionMapper(object):
             if 'logMessages' in tx_meta_json:
                 transaction.log_messages = tx_meta_json.get('logMessages')
 
-            balance_changes: list[BalanceChange] = []
+            balance_changes: List[BalanceChange] = []
             if 'postBalances' in tx_meta_json and 'preBalances' in tx_meta_json:
                 post_token_balances = tx_meta_json.get('postBalances')
                 pre_token_balances = tx_meta_json.get('preBalances')
@@ -104,7 +105,7 @@ class TransactionMapper(object):
             'after': balance_change.after,
         }
 
-    def to_dict(self, transaction: Transaction) -> dict:
+    def to_dict(self, transaction: Transaction) -> Dict:
         return {
             'type': 'transaction',
             'signature': transaction.signature,
@@ -125,7 +126,7 @@ class TransactionMapper(object):
             'post_token_balances': json.dumps(transaction.post_token_balances),
         }
 
-    def from_dict(self, dict: dict) -> Transaction:
+    def from_dict(self, dict: Dict) -> Transaction:
         transaction = Transaction()
 
         transaction.signature = dict.get('signature')

@@ -17,11 +17,13 @@
 
 
 import json
+from typing import Dict
+
 from solanaetl.domain.instruction import Instruction
 
 
 class InstructionMapper(object):
-    def from_json_dict(self, json_dict: dict, tx_signature: str, index: int, parent_index: int = None) -> Instruction:
+    def from_json_dict(self, json_dict: Dict, tx_signature: str, index: int, parent_index: int = None) -> Instruction:
         instruction = Instruction()
         instruction.tx_signature = tx_signature
         instruction.index = index
@@ -41,7 +43,7 @@ class InstructionMapper(object):
 
         return instruction
 
-    def to_dict(self, instruction: Instruction) -> dict:
+    def to_dict(self, instruction: Instruction) -> Dict:
         return {
             'type': 'instruction',
             'tx_signature': instruction.tx_signature,
@@ -55,7 +57,7 @@ class InstructionMapper(object):
             'params': json.dumps(instruction.params),
         }
 
-    def from_dict(self, dict: dict) -> Instruction:
+    def from_dict(self, dict: Dict) -> Instruction:
         instruction = Instruction()
 
         instruction.tx_signature = dict.get('tx_signature')

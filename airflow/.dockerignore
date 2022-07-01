@@ -160,11 +160,10 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+.vscode
 .DS_Store
 cli/*.csv
 cli/*.txt
 cli/test.py
+cli/tests/
 cli/output/
-
-airflow/logs/
-airflow/plugins/

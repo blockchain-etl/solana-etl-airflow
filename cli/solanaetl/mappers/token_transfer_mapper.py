@@ -16,12 +16,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+from typing import Dict
+
 from solanaetl.domain.token_transfer import TokenTransfer
 
 
 class TokenTransferMapper(object):
 
-    def to_dict(self, token_transfer: TokenTransfer) -> dict:
+    def to_dict(self, token_transfer: TokenTransfer) -> Dict:
         return {
             'type': 'token_transfer',
             'source': token_transfer.source,

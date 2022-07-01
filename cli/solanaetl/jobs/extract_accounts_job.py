@@ -17,6 +17,7 @@
 
 
 import json
+from typing import List
 
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
@@ -61,7 +62,7 @@ class ExtractAccountsJob(BaseJob):
         account_keys = sorted(list(account_keys))
         self.batch_work_executor.execute(account_keys, self._extract_accounts)
 
-    def _extract_accounts(self, account_keys: list):
+    def _extract_accounts(self, account_keys: List):
         rpc_requests = list(
             generate_get_multiple_accounts_json_rpc([account_keys]))
 

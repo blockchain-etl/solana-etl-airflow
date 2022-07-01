@@ -16,6 +16,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
+from typing import Dict
 from solanaetl.decoder.mango_markets_v3 import MangoMarketsV3ProgramDecoder
 
 from solanaetl.decoder.program_decoder import ProgramDecoder
@@ -29,7 +30,7 @@ MANGO_MARKETS_V3 = os.getenv(
     'MANGO_MARKETS_V3', 'mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68')
 
 # Put your decoder here
-PROGRAM_DECODER: dict[str, ProgramDecoder] = {
+PROGRAM_DECODER: Dict[str, ProgramDecoder] = {
     SERUM_DEX_V3: SerumDexV3ProgramDecoder(),
     MANGO_MARKETS_V3: MangoMarketsV3ProgramDecoder(),
 }

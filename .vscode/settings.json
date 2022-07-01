@@ -30,6 +30,6 @@
     },
     "python.analysis.extraPaths": [
         "./cli",
-        "./airflow"
+        "./airflow/dags"
     ]
 }
