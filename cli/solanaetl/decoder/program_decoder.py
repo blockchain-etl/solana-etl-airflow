@@ -19,10 +19,9 @@
 import logging
 from abc import abstractmethod
 from inspect import isfunction, signature
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Tuple
 
 from base58 import b58decode
-
 from solanaetl.domain.instruction import Instruction
 
 
@@ -32,7 +31,7 @@ class ProgramDecoder(object):
         self.can_decode = can_decode
 
     @abstractmethod
-    def discrim(self) -> Callable[[bytes, int], tuple[int, int]]:
+    def discrim(self) -> Callable[[bytes, int], Tuple[int, int]]:
         """
         :return: buffer layout lambda (u32, u64,...)
         """
@@ -47,13 +46,13 @@ class ProgramDecoder(object):
         raise NotImplementedError
 
     @abstractmethod
-    def params(self) -> dict[int, dict[str, Any]]:
+    def params(self) -> Dict[int, Dict[str, Any]]:
         """
         :return: instruction unpack params (ordered)
         """
         raise NotImplementedError
 
-    def decode(self, instruction: Instruction, initial_offset: int = 0) -> tuple[str, dict[str, object]]:
+    def decode(self, instruction: Instruction, initial_offset: int = 0) -> Tuple[str, Dict[str, Any]]:
         """
         :return: instruction name, decoded params
         """

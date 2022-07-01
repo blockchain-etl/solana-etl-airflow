@@ -17,6 +17,7 @@
 
 
 import json
+from typing import Dict
 
 from solanaetl.domain.block import Block
 from solanaetl.mappers.transaction_mapper import TransactionMapper
@@ -29,7 +30,7 @@ class BlockMapper(object):
         else:
             self.transaction_mapper = transaction_mapper
 
-    def from_json_dict(self, json_dict) -> Block:
+    def from_json_dict(self, json_dict: Dict) -> Block:
         block = Block()
         block.number = int(json_dict.get('parentSlot')) + 1
         block.hash = json_dict.get('blockhash')
@@ -63,7 +64,7 @@ class BlockMapper(object):
 
         return block
 
-    def to_dict(self, block: Block) -> dict:
+    def to_dict(self, block: Block) -> Dict:
         return {
             'type': 'block',
             'number': block.number,

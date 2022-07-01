@@ -19,6 +19,7 @@
 import contextlib
 import csv
 import json
+from typing import List
 
 from blockchainetl_common.csv_utils import set_max_field_size_limit
 from blockchainetl_common.file_utils import get_file_handle, smart_open
@@ -125,7 +126,7 @@ def extract_field(input_file, output_file, field):
             output.write(item[field] + '\n')
 
 
-def safe_get(arr: list, index: int, default=None):
+def safe_get(arr: List, index: int, default=None):
     try:
         return arr[index]
     except:

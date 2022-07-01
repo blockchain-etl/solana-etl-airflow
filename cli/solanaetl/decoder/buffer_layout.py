@@ -16,7 +16,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from typing import Any, Callable
+from typing import Any, Callable, List, Tuple
+
 from base58 import b58encode
 
 V2E32 = pow(2, 32)
@@ -26,54 +27,54 @@ def rounded_int64(hi32, lo32):
     return hi32 * V2E32 + lo32
 
 
-def sint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
+def sint(data: bytes, n_bytes: int, offset: int = 0) -> Tuple[int, int]:
     """signed int"""
     data_bytes, offset = blob(data, n_bytes, offset)
     return int.from_bytes(data_bytes, byteorder="little", signed=True), offset
 
 
-def uint(data: bytes, n_bytes: int, offset: int = 0) -> tuple[int, int]:
+def uint(data: bytes, n_bytes: int, offset: int = 0) -> Tuple[int, int]:
     """unsigned int"""
     data_bytes, offset = blob(data, n_bytes, offset)
     return int.from_bytes(data_bytes, byteorder="little"), offset
 
 
-def u8(data: bytes, offset: int = 0) -> tuple[int, int]:
+def u8(data: bytes, offset: int = 0) -> Tuple[int, int]:
     return uint(data, 1, offset)
 
 
-def u16(data: bytes, offset: int = 0) -> tuple[int, int]:
+def u16(data: bytes, offset: int = 0) -> Tuple[int, int]:
     return uint(data, 2, offset)
 
 
-def u32(data: bytes, offset: int = 0) -> tuple[int, int]:
+def u32(data: bytes, offset: int = 0) -> Tuple[int, int]:
     return uint(data, 4, offset)
 
 
-def u64(data: bytes, offset: int = 0) -> tuple[int, int]:
+def u64(data: bytes, offset: int = 0) -> Tuple[int, int]:
     return uint(data, 8, offset)
 
 
-def u128(data: bytes, offset: int = 0) -> tuple[int, int]:
+def u128(data: bytes, offset: int = 0) -> Tuple[int, int]:
     return uint(data, 16, offset)
 
 
-def ns64(data: bytes, offset: int = 0) -> tuple[int, int]:
+def ns64(data: bytes, offset: int = 0) -> Tuple[int, int]:
     lo32, next_offset = u32(data, offset)
     hi32, next_offset = u32(data, next_offset)
     return rounded_int64(hi32, lo32), next_offset
 
 
-def blob(data: bytes, n_bytes: int, offset: int = 0) -> tuple[bytes, int]:
+def blob(data: bytes, n_bytes: int, offset: int = 0) -> Tuple[bytes, int]:
     return data[offset:offset+n_bytes], offset+n_bytes
 
 
-def public_key(data: bytes, offset: int = 0) -> tuple[str, int]:
+def public_key(data: bytes, offset: int = 0) -> Tuple[str, int]:
     public_key_bytes, next_offset = blob(data, 32, offset)
     return b58encode(public_key_bytes).decode("utf-8"), next_offset
 
 
-def iter_blob(data: bytes, item_handler: Callable, n_items: int, offset: int = 0) -> tuple[list, int]:
+def iter_blob(data: bytes, item_handler: Callable, n_items: int, offset: int = 0) -> Tuple[List, int]:
     results = []
     next_offset = offset
     for i in range(n_items):

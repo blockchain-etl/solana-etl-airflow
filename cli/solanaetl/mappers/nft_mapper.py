@@ -17,12 +17,13 @@
 
 
 import json
+from typing import Dict
 
 from solanaetl.domain.nft import Nft
 
 
 class NftMapper(object):
-    def from_metaplex_metadata(self, metadata: dict) -> Nft:
+    def from_metaplex_metadata(self, metadata: Dict) -> Nft:
         nft = Nft()
         nft.mint = metadata.get('mint')
         nft.update_authority = metadata.get('update_authority')
@@ -47,7 +48,7 @@ class NftMapper(object):
 
         return nft
 
-    def to_dict(self, nft: Nft) -> dict:
+    def to_dict(self, nft: Nft) -> Dict:
         return {
             'type': 'nft',
             'mint': nft.mint,

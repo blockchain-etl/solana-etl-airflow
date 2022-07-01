@@ -15,6 +15,8 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from typing import List
+
 from solanaetl.domain.transaction import Transaction
 
 
@@ -26,7 +28,7 @@ class Block(object):
         self.height = None
         self.previous_block_hash = None
         self.transaction_count = None
-        self.transactions: list[Transaction] = None
+        self.transactions: List[Transaction] = None
         self.rewards = None
         self.leader_reward = None
         self.leader = None

@@ -134,7 +134,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             file_name_suffix=file_name_suffix,
         )
 
-        logger.info('Exporting accounts from blocks {block_range} to {accounts_file}'.format(
+        logger.info('Extracting accounts from blocks {block_range} to {accounts_file}'.format(
             block_range=block_range,
             accounts_file=accounts_file,
         ))
@@ -162,7 +162,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             file_name_suffix=file_name_suffix,
         )
 
-        logger.info('Exporting token transfers from blocks {block_range} to {token_transfers_file}'.format(
+        logger.info('Extracting token transfers from blocks {block_range} to {token_transfers_file}'.format(
             block_range=block_range,
             token_transfers_file=token_transfers_file,
         ))
@@ -188,7 +188,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             file_name_suffix=file_name_suffix,
         )
 
-        logger.info('Exporting nfts from blocks {block_range} to {nfts_file}'.format(
+        logger.info('Extracting nfts from blocks {block_range} to {nfts_file}'.format(
             block_range=block_range,
             nfts_file=nfts_file,
         ))

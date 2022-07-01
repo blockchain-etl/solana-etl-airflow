@@ -16,18 +16,15 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from typing import Any, Dict, List
+from solanaetl_airflow.build_export_dag import build_export_dag
+from solanaetl_airflow.variables import read_export_dag_vars
 
-
-class Instruction(object):
-    def __init__(self) -> None:
-        self.tx_signature = None
-        self.index = None
-        self.parent_index = None
-        self.accounts: List[str] = []
-        self.data = None
-        self.program = None
-        self.program_id = None
-        self.parsed = None
-        self.instruction_type = None
-        self.params: Dict[str, Any] = {}
+DAG = build_export_dag(
+    dag_id='solana_export_dag',
+    **read_export_dag_vars(
+        var_prefix='solana_',
+        export_schedule_interval='0 5 * * *',
+        export_max_active_runs=1,
+        export_max_workers=1,
+    )
+)

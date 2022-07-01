@@ -18,6 +18,7 @@
 
 import base64
 import json
+from typing import List
 
 from blockchainetl_common.jobs.base_job import BaseJob
 from blockchainetl_common.jobs.exporters.composite_item_exporter import \
@@ -66,7 +67,7 @@ class ExtractNftsJob(BaseJob):
         self.batch_work_executor.execute(
             metadata_accounts, self._extract_nfts)
 
-    def _extract_nfts(self, metadata_accounts: list[str]):
+    def _extract_nfts(self, metadata_accounts: List[str]):
         rpc_requests = list(
             generate_get_multiple_accounts_json_rpc([metadata_accounts], encoding='base64'))
 

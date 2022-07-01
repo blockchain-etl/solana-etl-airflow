@@ -16,12 +16,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
+from typing import Dict
 
 from solanaetl.domain.account import Account
 
 
 class AccountMapper(object):
-    def from_json_dict(self, json_dict: dict, accountKey: str = None) -> Account:
+    def from_json_dict(self, json_dict: Dict, accountKey: str = None) -> Account:
         account = Account()
         account.pubkey = accountKey
         account.executable = json_dict.get('executable')
@@ -34,9 +35,9 @@ class AccountMapper(object):
             account.space = data.get('space')
             account.program = data.get('program')
             if 'parsed' in data:
-                parsed_data: dict = data.get('parsed')
+                parsed_data: Dict = data.get('parsed')
                 account.account_type = parsed_data.get('type')
-                account_info: dict = parsed_data.get('info')
+                account_info: Dict = parsed_data.get('info')
                 if account_info is not None:
                     if account.account_type == 'program':
                         account.program_data = account_info.get('programData')
@@ -46,7 +47,7 @@ class AccountMapper(object):
                         account.owner = account_info.get('owner')
                         account.state = account_info.get('state')
 
-                        token_amount: dict = account_info.get('tokenAmount')
+                        token_amount: Dict = account_info.get('tokenAmount')
                         if token_amount is not None:
                             account.token_amount = token_amount.get('amount')
                             account.token_amount_decimals = token_amount.get(
@@ -79,7 +80,7 @@ class AccountMapper(object):
 
         return account
 
-    def to_dict(self, account: Account) -> dict:
+    def to_dict(self, account: Account) -> Dict:
         return {
             'type': 'account',
             'pubkey': account.pubkey,
@@ -108,7 +109,7 @@ class AccountMapper(object):
             'data': account.data,
         }
 
-    def from_dict(self, dict: dict) -> Account:
+    def from_dict(self, dict: Dict) -> Account:
         account = Account()
 
         account.pubkey = dict.get('pubkey')

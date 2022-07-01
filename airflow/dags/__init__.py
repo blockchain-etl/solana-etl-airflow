@@ -14,20 +14,3 @@
 # TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-from typing import Any, Dict, List
-
-
-class Instruction(object):
-    def __init__(self) -> None:
-        self.tx_signature = None
-        self.index = None
-        self.parent_index = None
-        self.accounts: List[str] = []
-        self.data = None
-        self.program = None
-        self.program_id = None
-        self.parsed = None
-        self.instruction_type = None
-        self.params: Dict[str, Any] = {}
