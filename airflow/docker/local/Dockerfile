@@ -7,10 +7,6 @@ RUN apt-get install -y --no-install-recommends build-essential gcc
 
 USER airflow
 
-# Install SolanaETL CLI for local development
-COPY --chown=airflow ./cli ./cli
-RUN cd ./cli && python setup.py install --user
-
 # Install required package for local development
 RUN pip install --no-cache-dir \
         discord-webhook \
@@ -18,3 +14,6 @@ RUN pip install --no-cache-dir \
         google-api-python-client \
         apache-airflow-providers-google
 
+# Install SolanaETL CLI for local development
+COPY --chown=airflow ./cli ./cli
+RUN cd ./cli && python setup.py install --user
