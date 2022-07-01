@@ -1,0 +1,52 @@
+[
+    {
+        "name": "tx_signature",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "index",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "parent_index",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "accounts",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "data",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "parsed",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "program",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "program_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "instruction_type",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "params",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    }
+]

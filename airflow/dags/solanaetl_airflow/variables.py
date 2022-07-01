@@ -37,6 +37,14 @@ def read_export_dag_vars(var_prefix, **kwargs):
 
 def read_load_dag_vars(var_prefix, **kwargs):
     """Read Airflow variables for Load DAG"""
+    load_start_block = int(read_var(
+        'export_start_block', var_prefix, True, **kwargs))
+
+    load_end_block = read_var(
+        'export_end_block', var_prefix, False, **kwargs)
+    load_end_block = int(
+        load_end_block) if load_end_block is not None else load_start_block+1
+
     output_bucket = read_var('output_bucket', var_prefix, True, **kwargs)
     checkpoint_bucket = read_var(
         'checkpoint_bucket', var_prefix, False, **kwargs)
@@ -45,17 +53,13 @@ def read_load_dag_vars(var_prefix, **kwargs):
     vars = {
         'output_bucket': output_bucket,
         'checkpoint_bucket': checkpoint_bucket,
+        'load_start_block': load_start_block,
+        'load_end_block': load_end_block,
         'destination_dataset_project_id': read_var('destination_dataset_project_id', var_prefix, True, **kwargs),
         'notification_emails': read_var('notification_emails', None, False, **kwargs),
-        # 'success_notification_emails': read_var('success_notification_emails', None, False, **kwargs),
         'load_schedule_interval': read_var('load_schedule_interval', var_prefix, True, **kwargs),
         'load_all_partitions': parse_bool(read_var('load_all_partitions', var_prefix, False, **kwargs), default=None),
     }
-
-    load_end_date = read_var('load_end_date', var_prefix, False, **kwargs)
-    if load_end_date is not None:
-        load_end_date = datetime.strptime(load_end_date, '%Y-%m-%d')
-        vars['load_end_date'] = load_end_date
 
     return vars
 

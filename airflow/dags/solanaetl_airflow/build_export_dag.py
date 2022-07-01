@@ -24,12 +24,12 @@ from tempfile import TemporaryDirectory
 import pendulum
 from airflow import DAG, configuration
 from airflow.operators import python_operator
-from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from solanaetl.cli import export_blocks_and_transactions, extract_accounts
 from solanaetl.cli.extract_nfts import extract_nfts
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 
 from solanaetl_airflow.utils.error_handling import handle_dag_failure
+from solanaetl_airflow.utils.gcs import download_from_gcs, upload_to_gcs
 
 
 def build_export_dag(
@@ -76,7 +76,8 @@ def build_export_dag(
         max_active_runs=export_max_active_runs
     )
 
-    gcs_hook = GCSHook(gcp_conn_id="google_cloud_default")
+    from airflow.providers.google.cloud.hooks.gcs import GCSHook
+    gcs_hook = GCSHook()
 
     # Export
     def export_path(directory, start_block, end_block):
@@ -280,17 +281,3 @@ def add_provider_uri_fallback_loop(python_callable, provider_uris):
                     raise e
 
     return python_callable_with_fallback
-
-
-def upload_to_gcs(gcs_hook: GCSHook, bucket_name, object_name, file_name, mime_type='application/octet-stream'):
-    storage_client = gcs_hook.get_conn()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(object_name)
-    blob.upload_from_filename(file_name, content_type=mime_type, timeout=300)
-
-
-def download_from_gcs(gcs_hook: GCSHook, bucket, object, filename):
-    storage_client = gcs_hook.get_conn()
-    bucket = storage_client.get_bucket(bucket)
-    blob = bucket.blob(object)
-    blob.download_to_filename(filename, timeout=300)
