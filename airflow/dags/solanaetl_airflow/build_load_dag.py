@@ -17,18 +17,23 @@
 
 
 import json
+import logging
 import os
+import time
 from datetime import timedelta
 from tempfile import TemporaryDirectory
 
 import pendulum
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
+from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
     GCSToBigQueryOperator
 from google.cloud import bigquery
+from google.cloud.bigquery import TimePartitioning
 
+from solanaetl_airflow.utils.bigquery import submit_bigquery_job
 from solanaetl_airflow.utils.error_handling import handle_dag_failure
 from solanaetl_airflow.utils.gcs import upload_to_gcs
 
@@ -64,6 +69,18 @@ def build_load_dag(
         'destination_dataset_project_id': destination_dataset_project_id,
         'load_all_partitions': load_all_partitions
     }
+
+    def read_bigquery_schema_from_file(filepath):
+        result = []
+        file_content = read_file(filepath)
+        json_content = json.loads(file_content)
+        for field in json_content:
+            result.append(bigquery.SchemaField(
+                name=field.get('name'),
+                field_type=field.get('type', 'STRING'),
+                mode=field.get('mode', 'NULLABLE'),
+                description=field.get('description')))
+        return result
 
     def read_file(file_path):
         with open(file_path) as f:
@@ -127,6 +144,108 @@ def build_load_dag(
         wait_sensor >> load_operator
         return load_operator
 
+    def add_enrich_tasks(task, time_partitioning_field='block_timestamp', dependencies=None, always_load_all_partitions=False):
+        def enrich_task(ds, **kwargs):
+            template_context = kwargs.copy()
+            template_context['ds'] = ds
+            template_context['params'] = environment
+
+            bq_hook = BigQueryHook()
+            bq_client = bq_hook.get_client()
+
+            # Need to use a temporary table because bq query sets field modes to NULLABLE and descriptions to null
+            # when writeDisposition is WRITE_TRUNCATE
+
+            # Create a temporary table
+            temp_table_name = f'{task}_{int(round(time.time() * 1000))}'
+            temp_table_ref = bq_client.dataset(
+                dataset_name_temp).table(temp_table_name)
+
+            schema_path = os.path.join(
+                dags_folder, f'resources/stages/enrich/schemas/{task}.json')
+            schema = read_bigquery_schema_from_file(schema_path)
+            table = bigquery.Table(temp_table_ref, schema=schema)
+
+            description_path = os.path.join(
+                dags_folder, f'resources/stages/enrich/descriptions/{task}.txt')
+            table.description = read_file(description_path)
+            if time_partitioning_field is not None:
+                table.time_partitioning = TimePartitioning(
+                    field=time_partitioning_field)
+            logging.info('Creating table: ' + json.dumps(table.to_api_repr()))
+            table = bq_client.create_table(table)
+            assert table.table_id == temp_table_name
+
+            # Query from raw to temporary table
+            query_job_config = bigquery.QueryJobConfig()
+            # Finishes faster, query limit for concurrent interactive queries is 50
+            query_job_config.priority = bigquery.QueryPriority.INTERACTIVE
+            query_job_config.destination = temp_table_ref
+
+            sql_path = os.path.join(
+                dags_folder, 'resources/stages/enrich/sqls/{task}.sql'.format(task=task))
+            sql_template = read_file(sql_path)
+            sql = kwargs['task'].render_template(
+                sql_template, template_context)
+            print('Enrichment sql:')
+            print(sql)
+
+            query_job = bq_client.query(
+                sql, location='US', job_config=query_job_config)
+            submit_bigquery_job(query_job, query_job_config)
+            assert query_job.state == 'DONE'
+
+            if load_all_partitions or always_load_all_partitions:
+                # Copy temporary table to destination
+                copy_job_config = bigquery.CopyJobConfig()
+                copy_job_config.write_disposition = 'WRITE_TRUNCATE'
+                dest_table_name = f'{task}'
+                dest_table_ref = bq_client.dataset(
+                    dataset_name, project=destination_dataset_project_id).table(dest_table_name)
+                copy_job = bq_client.copy_table(
+                    temp_table_ref, dest_table_ref, location='US', job_config=copy_job_config)
+                submit_bigquery_job(copy_job, copy_job_config)
+                assert copy_job.state == 'DONE'
+            else:
+                # Merge
+                # https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement
+                merge_job_config = bigquery.QueryJobConfig()
+                # Finishes faster, query limit for concurrent interactive queries is 50
+                merge_job_config.priority = bigquery.QueryPriority.INTERACTIVE
+
+                merge_sql_path = os.path.join(
+                    dags_folder, f'resources/stages/enrich/sqls/merge/merge_{task}.sql')
+                merge_sql_template = read_file(merge_sql_path)
+
+                merge_template_context = template_context.copy()
+                merge_template_context['params']['source_table'] = temp_table_name
+                merge_template_context['params']['destination_dataset_project_id'] = destination_dataset_project_id
+                merge_template_context['params']['destination_dataset_name'] = dataset_name
+                merge_sql = kwargs['task'].render_template(
+                    merge_sql_template, merge_template_context)
+                print('Merge sql:')
+                print(merge_sql)
+                merge_job = bq_client.query(
+                    merge_sql, location='US', job_config=merge_job_config)
+                submit_bigquery_job(merge_job, merge_job_config)
+                assert merge_job.state == 'DONE'
+
+            # Delete temp table
+            bq_client.delete_table(temp_table_ref)
+
+        enrich_operator = PythonOperator(
+            task_id=f'enrich_{task}',
+            python_callable=enrich_task,
+            provide_context=True,
+            execution_timeout=timedelta(minutes=60),
+            dag=dag
+        )
+
+        if dependencies is not None and len(dependencies) > 0:
+            for dependency in dependencies:
+                dependency >> enrich_operator
+        return enrich_operator
+
     def add_save_checkpoint_tasks(dependencies=None):
         def save_checkpoint(**kwargs):
             with TemporaryDirectory() as tempdir:
@@ -154,5 +273,18 @@ def build_load_dag(
     load_blocks_task = add_load_tasks('blocks', 'csv')
     load_transactions_task = add_load_tasks('transactions', 'csv')
     load_instructions_task = add_load_tasks('instructions', 'csv')
+    load_nfts_task = add_load_tasks('nfts', 'csv')
+    load_token_transfers_task = add_load_tasks('token_transfers', 'csv')
+    load_accounts_task = add_load_tasks('accounts', 'csv')
+
+    enrich_blocks_task = add_enrich_tasks(
+        'blocks', time_partitioning_field='timestamp', dependencies=[load_blocks_task])
+    enrich_transactions_task = add_enrich_tasks(
+        'transactions', dependencies=[load_transactions_task])
+    enrich_instructions_task = add_enrich_tasks(
+        'instructions', dependencies=[load_transactions_task, load_instructions_task])
+    enrich_token_transfers_task = add_enrich_tasks(
+        'token_transfers', dependencies=[load_transactions_task, load_token_transfers_task])
+    # enrich_nfts_task = add_enrich_tasks('nfts', dependencies=[load_nfts_task])
 
     return dag

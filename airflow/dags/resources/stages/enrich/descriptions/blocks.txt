@@ -1,0 +1,2 @@
+The Solana blockchain is composed of a series of blocks. This table contains a set of all blocks in the blockchain and their attributes.
+Data is exported using https://github.com/blockchain-etl/solana-etl
