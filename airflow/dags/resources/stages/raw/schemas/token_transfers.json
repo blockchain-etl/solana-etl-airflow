@@ -2,12 +2,12 @@
     {
         "name": "source",
         "type": "STRING",
-        "mode": "REQUIRED"
+        "mode": "NULLABLE"
     },
     {
         "name": "destination",
         "type": "STRING",
-        "mode": "REQUIRED"
+        "mode": "NULLABLE"
     },
     {
         "name": "authority",
@@ -17,6 +17,26 @@
     {
         "name": "value",
         "type": "NUMERIC",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "decimals",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mint",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mint_authority",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "transfer_type",
+        "type": "STRING",
         "mode": "NULLABLE"
     },
     {

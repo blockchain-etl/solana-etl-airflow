@@ -1,5 +1,25 @@
 [
     {
+        "name": "block_number",
+        "type": "INT64",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_timestamp",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "tx_signature",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
         "name": "mint",
         "type": "STRING",
         "mode": "REQUIRED"

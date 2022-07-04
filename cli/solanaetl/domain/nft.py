@@ -21,6 +21,7 @@ from typing import List
 
 class Nft(object):
     def __init__(self) -> None:
+        self.tx_signature = None
         self.mint = None
         self.update_authority = None
         self.name = None

@@ -285,6 +285,9 @@ def build_load_dag(
         'instructions', dependencies=[load_transactions_task, load_instructions_task])
     enrich_token_transfers_task = add_enrich_tasks(
         'token_transfers', dependencies=[load_transactions_task, load_token_transfers_task])
-    # enrich_nfts_task = add_enrich_tasks('nfts', dependencies=[load_nfts_task])
+    enrich_accounts_task = add_enrich_tasks(
+        'accounts', dependencies=[load_transactions_task, load_accounts_task])
+    enrich_nfts_task = add_enrich_tasks(
+        'nfts', dependencies=[load_transactions_task, load_nfts_task])
 
     return dag

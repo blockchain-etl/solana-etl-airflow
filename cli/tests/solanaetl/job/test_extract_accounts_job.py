@@ -66,7 +66,7 @@ def test_extract_accounts(
         item_exporter=accounts_item_exporter(
             accounts_output=accounts_output_file,
         ),
-        transactions_iterable=transactions_csv_reader,
+        instructions_iterable=transactions_csv_reader,
     )
     job.run()
 

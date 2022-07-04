@@ -26,8 +26,10 @@ from solanaetl.domain.account import Account
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
 from solanaetl.mappers.account_mapper import AccountMapper
+from solanaetl.mappers.instruction_mapper import InstructionMapper
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
+from solanaetl.services.account_extractor import extract_account_pubkey_from_instruction
 from solanaetl.utils import rpc_response_batch_to_results
 
 
@@ -35,34 +37,34 @@ class ExtractAccountsJob(BaseJob):
     def __init__(
             self,
             batch_web3_provider: BatchProvider,
-            transactions_iterable,
+            instructions_iterable,
             batch_size,
             max_workers,
             item_exporter: CompositeItemExporter):
         self.batch_web3_provider = batch_web3_provider
-        self.transactions_iterable = transactions_iterable
+        self.instructions_iterable = instructions_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
 
-        self.transaction_mapper = TransactionMapper()
+        self.instruction_mapper = InstructionMapper()
         self.account_mapper = AccountMapper()
 
     def _start(self):
         self.item_exporter.open()
 
     def _export(self):
-        account_keys = set({})
-        for transaction_dict in self.transactions_iterable:
-            transaction = self.transaction_mapper.from_dict(
-                transaction_dict)
-            account_keys = account_keys.union(set([account.get('pubkey')
-                                                   for account in transaction.accounts]))
+        # Only extract created account on block
+        created_accounts = [extract_account_pubkey_from_instruction(
+            self.instruction_mapper.from_dict(instruction)) for instruction in self.instructions_iterable]
+        created_accounts = [
+            account for account in created_accounts if account.pubkey is not None]
 
-        account_keys = sorted(list(account_keys))
-        self.batch_work_executor.execute(account_keys, self._extract_accounts)
+        self.batch_work_executor.execute(
+            created_accounts, self._extract_accounts)
 
-    def _extract_accounts(self, account_keys: List):
+    def _extract_accounts(self, accounts: List[Account]):
+        account_keys = [account.pubkey for account in accounts]
         rpc_requests = list(
             generate_get_multiple_accounts_json_rpc([account_keys]))
 
@@ -72,7 +74,9 @@ class ExtractAccountsJob(BaseJob):
 
         accounts = [
             self.account_mapper.from_json_dict(
-                json_dict, accountKey=account_keys[idx])
+                json_dict,
+                pubkey=accounts[idx].pubkey,
+                tx_signature=accounts[idx].tx_signature)
             for result in results
             for idx, json_dict in enumerate(result.get('value'))
             if json_dict is not None

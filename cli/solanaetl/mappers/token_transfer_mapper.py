@@ -30,5 +30,9 @@ class TokenTransferMapper(object):
             'destination': token_transfer.destination,
             'authority': token_transfer.authority,
             'value': token_transfer.value,
+            'decimals': token_transfer.decimals,
+            'mint': token_transfer.mint,
+            'mint_authority': token_transfer.mint_authority,
+            'transfer_type':  token_transfer.transfer_type,
             'tx_signature': token_transfer.tx_signature,
         }

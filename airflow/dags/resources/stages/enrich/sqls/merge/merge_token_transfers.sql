@@ -6,20 +6,28 @@ INSERT (
     block_number,
     block_timestamp,
     block_hash,
-    tx_signature,
     source,
     destination,
     authority,
-    value
+    value,
+    decimals,
+    mint,
+    mint_authority,
+    transfer_type,
+    tx_signature
 ) VALUES (
     block_number,
     block_timestamp,
     block_hash,
-    tx_signature,
     source,
     destination,
     authority,
-    value
+    value,
+    decimals,
+    mint,
+    mint_authority,
+    transfer_type,
+    tx_signature
 )
 WHEN NOT MATCHED BY source AND DATE(block_timestamp) = '{{ds}}' THEN
 DELETE

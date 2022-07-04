@@ -139,11 +139,11 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             accounts_file=accounts_file,
         ))
 
-        with get_item_iterable(transactions_file) as transactions_reader:
+        with get_item_iterable(instructions_file) as instructions_reader:
             job = ExtractAccountsJob(
                 batch_web3_provider=ThreadLocalProxy(
                     lambda: get_provider_from_uri(provider_uri, batch=True)),
-                transactions_iterable=transactions_reader,
+                instructions_iterable=instructions_reader,
                 batch_size=batch_size,
                 max_workers=max_workers,
                 item_exporter=accounts_item_exporter(accounts_file))
