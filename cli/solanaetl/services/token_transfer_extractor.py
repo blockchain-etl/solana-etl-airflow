@@ -23,15 +23,10 @@ from solanaetl.domain.token_transfer import TokenTransfer
 
 TOKEN_PROGRAM = 'spl-token'
 SYSTEM_PROGRAM = 'system'
-
-
-# Token program instruction
 TRANSFER = 'transfer'
 TRANSFER_CHECKED = 'transferChecked'
 BURN = 'burn'
 BURN_CHECKED = 'burnChecked'
-INITIALIZE_ACCOUNT = 'initializeAccount'
-INITIALIZE_MINT = 'initializeMint'
 MINT_TO = 'mintTo'
 MINT_TO_CHECKED = 'mintToChecked'
 
@@ -60,19 +55,11 @@ def extract_transfer_from_instruction(instruction: Instruction) -> TokenTransfer
         if instruction.instruction_type == BURN_CHECKED:
             token_transfer.decimals = instruction.params.get('decimals')
 
-        if instruction.instruction_type.startswith(INITIALIZE_ACCOUNT):
-            token_transfer.mint = instruction.params.get('mint')
-            token_transfer.transfer_type = 'initializeAccount'
-
-        if instruction.instruction_type == INITIALIZE_MINT:
-            token_transfer.mint = instruction.params.get('mint')
-            token_transfer.mint_authority = instruction.params.get(
-                'mintAuthority')
-            token_transfer.transfer_type = 'initializeMint'
-
         if instruction.instruction_type == MINT_TO or instruction.instruction_type == MINT_TO_CHECKED:
             token_transfer.mint = instruction.params.get('mint')
             token_transfer.value = instruction.params.get('amount')
+            token_transfer.mint_authority = instruction.params.get(
+                'mintAuthority')
             token_transfer.transfer_type = 'mintTo'
         if instruction.instruction_type == MINT_TO_CHECKED:
             token_transfer.decimals = instruction.params.get('decimals')
