@@ -162,9 +162,9 @@ cython_debug/
 
 .DS_Store
 cli/*.csv
-cli/*.txt
 cli/test.py
 cli/output/
+cli/input/
 
 airflow/logs/
 airflow/plugins/

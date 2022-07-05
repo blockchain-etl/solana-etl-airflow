@@ -63,7 +63,10 @@ SELECT
         CAST(JSON_EXTRACT(accounts.last_timestamp, '$.slot') AS INT64) AS slot,
         TIMESTAMP_SECONDS(CAST(JSON_EXTRACT(accounts.last_timestamp, '$.timestamp') AS INT64)) AS timestamp
     ) AS last_timestamp,
-    accounts.data
+    STRUCT(
+        JSON_QUERY(accounts.data, '$.0') AS raw,
+        JSON_QUERY(accounts.data, '$.1') AS encoding
+    ) AS data
 FROM {{params.dataset_name_raw}}.accounts AS accounts
     LEFT JOIN {{params.dataset_name_raw}}.transactions ON transactions.signature = accounts.tx_signature
 WHERE true

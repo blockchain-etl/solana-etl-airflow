@@ -21,7 +21,7 @@ def handle_dag_failure(context: Dict) -> None:
 
 
 def post_alert_to_discord(context: Dict) -> None:
-    webhook_url = Variable.get("discord_alerts_webhook_url")
+    webhook_url = Variable.get('discord_alerts_webhook_url')
     if not webhook_url:
         return
 

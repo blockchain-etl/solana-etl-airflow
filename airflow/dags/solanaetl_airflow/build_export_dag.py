@@ -41,6 +41,7 @@ def build_export_dag(
     notification_emails=None,
     export_schedule_interval='0 0 * * *',
     export_max_workers=1,
+    export_block_batch_size=1,
     export_batch_size=100,
     export_max_active_runs=None,
     export_retries=5,
@@ -115,7 +116,7 @@ def build_export_dag(
             export_blocks_and_transactions.callback(
                 start_block=export_start_block,
                 end_block=export_end_block,
-                batch_size=export_batch_size,
+                batch_size=export_block_batch_size,
                 provider_uri=provider_uri,
                 max_workers=export_max_workers,
                 blocks_output=os.path.join(tempdir, "blocks.csv"),

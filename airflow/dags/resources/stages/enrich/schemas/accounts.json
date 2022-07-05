@@ -206,7 +206,19 @@
     },
     {
         "name": "data",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+            {
+                "name": "raw",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "encoding",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
     }
 ]
