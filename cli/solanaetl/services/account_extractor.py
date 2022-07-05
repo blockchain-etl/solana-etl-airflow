@@ -16,28 +16,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from blockchainetl_common.jobs.exporters.composite_item_exporter import \
-    CompositeItemExporter
+from solanaetl.domain.account import Account
+from solanaetl.domain.instruction import Instruction
 
-TOKEN_TRANFER_FIELDS_TO_EXPORT = [
-    'source',
-    'destination',
-    'authority',
-    'value',
-    'decimals',
-    'mint',
-    'mint_authority',
-    'transfer_type',
-    'tx_signature',
-]
+SYSTEM_PROGRAM = 'system'
 
 
-def token_transfers_item_exporter(token_transfers_output=None):
-    return CompositeItemExporter(
-        filename_mapping={
-            'token_transfer': token_transfers_output,
-        },
-        field_mapping={
-            'token_transfer': TOKEN_TRANFER_FIELDS_TO_EXPORT,
-        }
-    )
+def extract_account_pubkey_from_instruction(instruction: Instruction) -> Account:
+    account = Account()
+
+    if instruction.program == SYSTEM_PROGRAM and instruction.instruction_type == 'createAccount':
+        account.pubkey = instruction.params.get('newAccount')
+        account.tx_signature = instruction.tx_signature
+
+    return account

@@ -21,6 +21,7 @@ from blockchainetl_common.jobs.exporters.composite_item_exporter import \
 
 ACCOUNT_FIELDS_TO_EXPORT = [
     'pubkey',
+    'tx_signature',
     'executable',
     'lamports',
     'owner',

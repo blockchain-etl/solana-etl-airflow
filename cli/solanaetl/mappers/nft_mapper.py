@@ -23,8 +23,9 @@ from solanaetl.domain.nft import Nft
 
 
 class NftMapper(object):
-    def from_metaplex_metadata(self, metadata: Dict) -> Nft:
+    def from_metaplex_metadata(self, metadata: Dict, tx_signature: str = None) -> Nft:
         nft = Nft()
+        nft.tx_signature = tx_signature
         nft.mint = metadata.get('mint')
         nft.update_authority = metadata.get('update_authority')
         nft.name = metadata.get('data').get('name')
@@ -51,6 +52,7 @@ class NftMapper(object):
     def to_dict(self, nft: Nft) -> Dict:
         return {
             'type': 'nft',
+            'tx_signature': nft.tx_signature,
             'mint': nft.mint,
             'update_authority': nft.update_authority,
             'name': nft.name,

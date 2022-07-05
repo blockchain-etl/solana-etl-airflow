@@ -22,9 +22,10 @@ from solanaetl.domain.account import Account
 
 
 class AccountMapper(object):
-    def from_json_dict(self, json_dict: Dict, accountKey: str = None) -> Account:
+    def from_json_dict(self, json_dict: Dict, pubkey: str = None, tx_signature: str = None) -> Account:
         account = Account()
-        account.pubkey = accountKey
+        account.pubkey = pubkey
+        account.tx_signature = tx_signature
         account.executable = json_dict.get('executable')
         account.lamports = json_dict.get('lamports')
         account.owner = json_dict.get('owner')
@@ -84,6 +85,7 @@ class AccountMapper(object):
         return {
             'type': 'account',
             'pubkey': account.pubkey,
+            'tx_signature': account.tx_signature,
             'executable': account.executable,
             'lamports': account.lamports,
             'owner': account.owner,
@@ -113,6 +115,9 @@ class AccountMapper(object):
         account = Account()
 
         account.pubkey = dict.get('pubkey')
+        account.tx_signature = dict.get('tx_signature')
+        account.account_type = dict.get('account_type')
+        account.mint = dict.get('mint')
         account.token_amount_decimals = dict.get('token_amount_decimals')
 
         return account

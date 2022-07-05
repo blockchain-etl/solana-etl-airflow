@@ -143,16 +143,16 @@ def build_export_dag(
     def extract_accounts_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
             copy_from_export_path(
-                export_path("transactions", export_start_block,
+                export_path("instructions", export_start_block,
                             export_end_block),
-                os.path.join(tempdir, "transactions.csv")
+                os.path.join(tempdir, "instructions.csv")
             )
 
             logging.info('Calling extract_accounts({}, {}, {}, {}, {}, ...)'.format(
                 export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
 
             extract_accounts.callback(
-                transactions=os.path.join(tempdir, "transactions.csv"),
+                instructions=os.path.join(tempdir, "instructions.csv"),
                 batch_size=export_batch_size,
                 output=os.path.join(tempdir, "accounts.csv"),
                 max_workers=export_max_workers,

@@ -19,6 +19,7 @@
 class Account(object):
     def __init__(self) -> None:
         self.pubkey = None
+        self.tx_signature = None  # creation tx
         self.executable = None
         self.lamports = None
         self.owner = None
@@ -49,4 +50,3 @@ class Account(object):
         self.votes = None
         self.root_slot = None
         self.last_timestamp = None
-        # if type = mint

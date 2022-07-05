@@ -20,6 +20,7 @@ from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
 
 NFT_FIELDS_TO_EXPORT = [
+    'tx_signature',
     'mint',
     'update_authority',
     'name',

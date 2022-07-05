@@ -1,0 +1,155 @@
+[
+    {
+        "name": "signature",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "previous_block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_number",
+        "type": "INT64",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_timestamp",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "fee",
+        "type": "NUMERIC",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "status",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "err",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "accounts",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "pubkey",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "signer",
+                "type": "BOOL",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "writable",
+                "type": "BOOL",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "log_messages",
+        "type": "STRING",
+        "mode": "REPEATED"
+    },
+    {
+        "name": "balance_changes",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "account",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "before",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "after",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "pre_token_balances",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "account_index",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "mint",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "owner",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "amount",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "decimals",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "post_token_balances",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "account_index",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "mint",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "owner",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "amount",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "decimals",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
+    }
+]

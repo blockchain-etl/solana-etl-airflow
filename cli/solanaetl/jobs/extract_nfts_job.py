@@ -25,6 +25,7 @@ from blockchainetl_common.jobs.exporters.composite_item_exporter import \
     CompositeItemExporter
 from solanaetl.decoder.metaplex.metadata import (get_metadata_account,
                                                  unpack_metadata_account)
+from solanaetl.domain.account import Account
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
 from solanaetl.mappers.account_mapper import AccountMapper
@@ -54,20 +55,21 @@ class ExtractNftsJob(BaseJob):
         self.item_exporter.open()
 
     def _export(self):
-        metadata_accounts = set({})
+        # only extract mint nft on block
         accounts = [
             self.account_mapper.from_dict(account_dict)
             for account_dict in self.accounts_iterable
+            if account_dict.get('token_amount_decimals') == '0' and account_dict.get('account_type') == 'mint'
         ]
-        for account in accounts:
-            if account.token_amount_decimals == '0':
-                metadata_accounts.add(
-                    str(get_metadata_account(account.pubkey)))
 
         self.batch_work_executor.execute(
-            metadata_accounts, self._extract_nfts)
+            accounts, self._extract_nfts)
 
-    def _extract_nfts(self, metadata_accounts: List[str]):
+    def _extract_nfts(self, accounts: List[Account]):
+        metadata_accounts = [
+            str(get_metadata_account(account.pubkey))
+            for account in accounts
+        ]
         rpc_requests = list(
             generate_get_multiple_accounts_json_rpc([metadata_accounts], encoding='base64'))
 
@@ -78,12 +80,12 @@ class ExtractNftsJob(BaseJob):
         nfts = []
 
         for result in results:
-            for value in result.get('value'):
+            for idx, value in enumerate(result.get('value')):
                 if value is not None:
                     data = base64.b64decode(value.get('data')[0])
                     metadata = unpack_metadata_account(data)
                     nfts.append(
-                        self.nft_mapper.from_metaplex_metadata(metadata))
+                        self.nft_mapper.from_metaplex_metadata(metadata, tx_signature=accounts[idx].tx_signature))
 
         for nft in nfts:
             self.item_exporter.export_item(

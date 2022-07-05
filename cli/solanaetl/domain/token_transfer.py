@@ -22,4 +22,8 @@ class TokenTransfer(object):
         self.destination = None
         self.authority = None
         self.value = None
+        self.decimals = None
+        self.mint = None
+        self.mint_authority = None
+        self.transfer_type = None
         self.tx_signature = None
