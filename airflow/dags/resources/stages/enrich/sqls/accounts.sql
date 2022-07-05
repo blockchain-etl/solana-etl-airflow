@@ -17,15 +17,52 @@ SELECT
     accounts.token_amount,
     accounts.token_amount_decimals,
     accounts.program_data,
-    accounts.authorized_voters,
+    ARRAY(
+        SELECT
+            STRUCT(
+                JSON_EXTRACT(authorized_voter, '$.authorizedVoter') AS authorized_voter,
+                CAST(JSON_EXTRACT(authorized_voter, '$.epoch') AS INT64) AS epoch
+            )
+        FROM
+            UNNEST(JSON_EXTRACT_ARRAY(accounts.authorized_voters)) AS authorized_voter 
+    ) as authorized_voters,
     accounts.authorized_withdrawer,
-    accounts.prior_voters,
+    ARRAY(
+        SELECT
+            STRUCT(
+                JSON_EXTRACT(prior_voter, '$.authorizedPubkey') AS authorized_pubkey,
+                CAST(JSON_EXTRACT(prior_voter, '$.epochOfLastAuthorizedSwitch') AS INT64) AS epoch_of_last_authorized_switch,
+                CAST(JSON_EXTRACT(prior_voter, '$.targetEpoch') AS INT64) AS target_epoch
+            )
+        FROM
+            UNNEST(JSON_EXTRACT_ARRAY(accounts.prior_voters)) AS prior_voter 
+    ) as prior_voters,
     accounts.node_pubkey,
     accounts.commission,
-    accounts.epoch_credits,
-    accounts.votes,
+    ARRAY(
+        SELECT
+            STRUCT(
+                JSON_EXTRACT(epoch_credit, '$.credits') AS credits,
+                CAST(JSON_EXTRACT(epoch_credit, '$.epoch') AS INT64) AS epoch,
+                JSON_EXTRACT(epoch_credit, '$.previousCredits') AS previous_credits
+            )
+        FROM
+            UNNEST(JSON_EXTRACT_ARRAY(accounts.epoch_credits)) AS epoch_credit 
+    ) as epoch_credits,
+    ARRAY(
+        SELECT
+            STRUCT(
+                CAST(JSON_EXTRACT(vote, '$.confirmationCount') AS INT64) AS confirmation_count,
+                CAST(JSON_EXTRACT(vote, '$.slot') AS INT64) AS slot
+            )
+        FROM
+            UNNEST(JSON_EXTRACT_ARRAY(accounts.votes)) AS vote 
+    ) as votes,
     accounts.root_slot,
-    accounts.last_timestamp,
+    STRUCT(
+        CAST(JSON_EXTRACT(accounts.last_timestamp, '$.slot') AS INT64) AS slot,
+        TIMESTAMP_SECONDS(CAST(JSON_EXTRACT(accounts.last_timestamp, '$.timestamp') AS INT64)) AS timestamp
+    ) AS last_timestamp,
     accounts.data
 FROM {{params.dataset_name_raw}}.accounts AS accounts
     LEFT JOIN {{params.dataset_name_raw}}.transactions ON transactions.signature = accounts.tx_signature

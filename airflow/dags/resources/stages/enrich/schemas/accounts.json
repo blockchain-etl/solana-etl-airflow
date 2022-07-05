@@ -91,8 +91,20 @@
     },
     {
         "name": "authorized_voters",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "authorized_voter",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "epoch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
     },
     {
         "name": "authorized_withdrawer",
@@ -101,8 +113,25 @@
     },
     {
         "name": "prior_voters",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "authorized_pubkey",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "epoch_of_last_authorized_switch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "target_epoch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
     },
     {
         "name": "node_pubkey",
@@ -116,13 +145,42 @@
     },
     {
         "name": "epoch_credits",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "credits",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "epoch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "previous_credits",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
     },
     {
         "name": "votes",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "confirmation_count",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "slot",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
     },
     {
         "name": "root_slot",
@@ -131,8 +189,20 @@
     },
     {
         "name": "last_timestamp",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+            {
+                "name": "slot",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "timestamp",
+                "type": "TIMESTAMP",
+                "mode": "NULLABLE"
+            }
+        ]
     },
     {
         "name": "data",
