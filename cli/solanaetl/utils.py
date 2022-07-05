@@ -19,6 +19,7 @@
 import contextlib
 import csv
 import json
+import logging
 from typing import List
 
 from blockchainetl_common.csv_utils import set_max_field_size_limit
@@ -84,10 +85,23 @@ def rpc_response_to_result(response):
             # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
             # synced node
             raise RetriableValueError(error_message)
+        elif response.get('error') is not None and is_skipable_error(response.get('error').get('code')):
+            logging.warning(error_message)
+            return None
         elif response.get('error') is not None and is_retriable_error(response.get('error').get('code')):
             raise RetriableValueError(error_message)
         raise ValueError(error_message)
     return result
+
+
+SKIPABLE_ERRORS = [
+    -32009,  # Slot {} was skipped, or missing in long-term storage
+]
+
+
+def is_skipable_error(error_code):
+    if error_code in SKIPABLE_ERRORS:
+        return True
 
 
 def is_retriable_error(error_code):

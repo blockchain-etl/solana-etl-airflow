@@ -22,14 +22,14 @@ import io
 import pytest
 import tests.resources
 from blockchainetl_common.csv_utils import set_max_field_size_limit
-from solanaetl.jobs.exporters.nfts_item_exporter import nfts_item_exporter
-from solanaetl.jobs.extract_nfts_job import ExtractNftsJob
+from solanaetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
+from solanaetl.jobs.extract_tokens_job import ExtractTokensJob
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import (compare_lines_ignore_order, read_file,
                            skip_if_slow_tests_disabled)
 from tests.solanaetl.job.helpers import get_web3_provider
 
-RESOURCE_GROUP = 'test_extract_nfts_job'
+RESOURCE_GROUP = 'test_extract_tokens_job'
 
 
 def read_resource(resource_group, file_name):
@@ -39,22 +39,22 @@ def read_resource(resource_group, file_name):
 @pytest.mark.parametrize(
     'batch_size,resource_group,web3_provider_type',
     [
-        (100, 'nfts_only', 'mock'),
+        (100, 'tokens_only', 'mock'),
         skip_if_slow_tests_disabled(
-            (100, 'nfts_only', 'online'),
+            (100, 'tokens_only', 'online'),
         )
     ],
 )
-def test_extract_nfts(
+def test_extract_tokens(
     tmpdir, batch_size, resource_group, web3_provider_type
 ):
-    nfts_output_file = str(tmpdir.join('actual_nfts.csv'))
+    tokens_output_file = str(tmpdir.join('actual_tokens.csv'))
 
     accounts_content = read_resource(resource_group, 'accounts.csv')
     set_max_field_size_limit()
     accounts_csv_reader = csv.DictReader(io.StringIO(accounts_content))
 
-    job = ExtractNftsJob(
+    job = ExtractTokensJob(
         batch_web3_provider=ThreadLocalProxy(
             lambda: get_web3_provider(
                 web3_provider_type,
@@ -64,14 +64,14 @@ def test_extract_nfts(
         ),
         batch_size=batch_size,
         max_workers=5,
-        item_exporter=nfts_item_exporter(
-            nfts_output=nfts_output_file,
+        item_exporter=tokens_item_exporter(
+            tokens_output=tokens_output_file,
         ),
         accounts_iterable=accounts_csv_reader,
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_nfts.csv'),
-        read_file(nfts_output_file),
+        read_resource(resource_group, 'expected_tokens.csv'),
+        read_file(tokens_output_file),
     )

@@ -27,9 +27,9 @@ from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
 from solanaetl.mappers.account_mapper import AccountMapper
 from solanaetl.mappers.instruction_mapper import InstructionMapper
-from solanaetl.mappers.transaction_mapper import TransactionMapper
 from solanaetl.providers.batch import BatchProvider
-from solanaetl.services.account_extractor import extract_account_pubkey_from_instruction
+from solanaetl.services.account_extractor import \
+    extract_account_pubkey_from_instruction
 from solanaetl.utils import rpc_response_batch_to_results
 
 

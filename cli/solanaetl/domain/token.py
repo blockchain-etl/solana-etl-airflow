@@ -16,29 +16,19 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from blockchainetl_common.jobs.exporters.composite_item_exporter import \
-    CompositeItemExporter
-
-NFT_FIELDS_TO_EXPORT = [
-    'tx_signature',
-    'mint',
-    'update_authority',
-    'name',
-    'symbol',
-    'uri',
-    'seller_fee_basis_points',
-    'creators',
-    'primary_sale_happened',
-    'is_mutable',
-]
+from typing import List
 
 
-def nfts_item_exporter(nfts_output=None):
-    return CompositeItemExporter(
-        filename_mapping={
-            'nft': nfts_output,
-        },
-        field_mapping={
-            'nft': NFT_FIELDS_TO_EXPORT,
-        }
-    )
+class Token(object):
+    def __init__(self) -> None:
+        self.tx_signature = None
+        self.mint = None
+        self.update_authority = None
+        self.name = None
+        self.symbol = None
+        self.uri = None
+        self.seller_fee_basis_points = None
+        self.creators: List = []
+        self.primary_sale_happened = None
+        self.is_mutable = None
+        self.token_type = None
