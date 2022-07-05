@@ -79,7 +79,6 @@ class ExtractAccountsJob(BaseJob):
                 tx_signature=accounts[idx].tx_signature)
             for result in results
             for idx, json_dict in enumerate(result.get('value'))
-            if json_dict is not None
         ]
 
         for account in accounts:

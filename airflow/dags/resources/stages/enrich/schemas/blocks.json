@@ -36,8 +36,35 @@
     },
     {
         "name": "rewards",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "commission",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "lamports",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "post_balance",
+                "type": "NUMERIC",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "pubkey",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "reward_type",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
     },
     {
         "name": "leader_reward",

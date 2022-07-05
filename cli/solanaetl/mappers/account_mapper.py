@@ -26,6 +26,11 @@ class AccountMapper(object):
         account = Account()
         account.pubkey = pubkey
         account.tx_signature = tx_signature
+
+        # empty account
+        if json_dict is None:
+            return account
+
         account.executable = json_dict.get('executable')
         account.lamports = json_dict.get('lamports')
         account.owner = json_dict.get('owner')
