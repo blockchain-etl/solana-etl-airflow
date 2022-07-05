@@ -38,8 +38,9 @@ setup(
         "base58",
         "blockchain-etl-common==1.6.1",
         "click==8.1.3",
-        "web3==5.29.2",
-        "based58==0.1.1",
+        "web3==6.0.0b3",
+        "solana==0.25.0",
+        "rlp==3.0.0",
         "requests",
     ],
     extras_require={

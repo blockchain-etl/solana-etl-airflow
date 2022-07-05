@@ -15,6 +15,20 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+from typing import List
+
+
 class Token(object):
     def __init__(self) -> None:
-        self.block_number = None
+        self.tx_signature = None
+        self.mint = None
+        self.update_authority = None
+        self.name = None
+        self.symbol = None
+        self.uri = None
+        self.seller_fee_basis_points = None
+        self.creators: List = []
+        self.primary_sale_happened = None
+        self.is_mutable = None
+        self.token_type = None

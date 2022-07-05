@@ -21,6 +21,7 @@ sdist/
 var/
 wheels/
 share/python-wheels/
+.idea
 *.egg-info/
 .installed.cfg
 *.egg
@@ -159,5 +160,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-**.csv
-test.py
+.DS_Store
+cli/*.csv
+cli/test.py
+cli/output/
+cli/input/
+
+airflow/logs/
+airflow/plugins/

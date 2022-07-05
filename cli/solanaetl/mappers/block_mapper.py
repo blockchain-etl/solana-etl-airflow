@@ -16,7 +16,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import logging
+import json
+from typing import Dict
+
 from solanaetl.domain.block import Block
 from solanaetl.mappers.transaction_mapper import TransactionMapper
 
@@ -27,9 +29,8 @@ class BlockMapper(object):
             self.transaction_mapper = TransactionMapper()
         else:
             self.transaction_mapper = transaction_mapper
-        pass
 
-    def json_dict_to_block(self, json_dict):
+    def from_json_dict(self, json_dict: Dict) -> Block:
         block = Block()
         block.number = int(json_dict.get('parentSlot')) + 1
         block.hash = json_dict.get('blockhash')
@@ -39,15 +40,16 @@ class BlockMapper(object):
 
         if 'rewards' in json_dict:
             rewards = json_dict.get('rewards')
+            block.rewards = rewards
             leader = next(reward for reward in rewards
                           if reward.get('rewardType') == 'Fee') if len(rewards) > 0 else None
             if leader is not None:
-                block.reward = leader.get('lamports')
+                block.leader_reward = leader.get('lamports')
                 block.leader = leader.get('pubkey')
 
         if 'transactions' in json_dict:
             block.transactions = [
-                self.transaction_mapper.json_dict_to_transaction(
+                self.transaction_mapper.from_json_dict(
                     tx,
                     block_timestamp=block.timestamp,
                     block_number=block.number,
@@ -56,12 +58,13 @@ class BlockMapper(object):
                 for tx in json_dict['transactions']
                 if isinstance(tx, dict)
             ]
-
-        block.transaction_count = len(json_dict['transactions'])
+            block.transaction_count = len(json_dict.get('transactions'))
+        elif 'signatures' in json_dict:
+            block.transaction_count = len(json_dict.get('signatures'))
 
         return block
 
-    def block_to_dict(self, block: Block):
+    def to_dict(self, block: Block) -> Dict:
         return {
             'type': 'block',
             'number': block.number,
@@ -70,6 +73,7 @@ class BlockMapper(object):
             'previous_block_hash': block.previous_block_hash,
             'timestamp': block.timestamp,
             'transaction_count': block.transaction_count,
-            'reward': block.reward,
+            'rewards': json.dumps(block.rewards),
+            'leader_reward': block.leader_reward,
             'leader': block.leader,
         }

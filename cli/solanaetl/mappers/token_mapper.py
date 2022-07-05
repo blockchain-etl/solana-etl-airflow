@@ -16,17 +16,52 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import json
+from typing import Dict
+
 from solanaetl.domain.token import Token
 
 
 class TokenMapper(object):
-    def token_to_dict(self, token: Token):
+    def from_metaplex_metadata(self, metadata: Dict, token_type: str = None, tx_signature: str = None) -> Token:
+        token = Token()
+        token.tx_signature = tx_signature
+        token.token_type = token_type
+        token.mint = metadata.get('mint')
+        token.update_authority = metadata.get('update_authority')
+        token.name = metadata.get('data').get('name')
+        token.symbol = metadata.get('data').get('symbol')
+        token.uri = metadata.get('data').get('uri')
+        token.seller_fee_basis_points = metadata.get(
+            'data').get('seller_fee_basis_points')
+        creators = metadata.get('data').get('creators')
+        verified = metadata.get('data').get('verified')
+        share = metadata.get('data').get('share')
+        token.creators = [
+            {
+                'address': creator.decode("utf-8"),
+                'verified': verified[idx],
+                'share': share[idx],
+            }
+            for idx, creator in enumerate(creators)
+        ]
+        token.primary_sale_happened = metadata.get('primary_sale_happened')
+        token.is_mutable = metadata.get('is_mutable')
+
+        return token
+
+    def to_dict(self, token: Token) -> Dict:
         return {
             'type': 'token',
-            # 'address': token.address,
-            # 'symbol': token.symbol,
-            # 'name': token.name,
-            # 'decimals': token.decimals,
-            # 'total_supply': token.total_supply,
-            # 'block_number': token.block_number
+            'tx_signature': token.tx_signature,
+            'token_type': token.token_type,
+            'mint': token.mint,
+            'update_authority': token.update_authority,
+            'name': token.name,
+            'symbol': token.symbol,
+            'uri': token.uri,
+            'seller_fee_basis_points': token.seller_fee_basis_points,
+            'creators': json.dumps(token.creators),
+            'primary_sale_happened': token.primary_sale_happened,
+            'is_mutable': token.is_mutable,
         }

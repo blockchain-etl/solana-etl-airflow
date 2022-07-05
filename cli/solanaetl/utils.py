@@ -16,7 +16,21 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import contextlib
+import csv
+import json
+import logging
+from typing import List
+
+from blockchainetl_common.csv_utils import set_max_field_size_limit
+from blockchainetl_common.file_utils import get_file_handle, smart_open
+
 from solanaetl.misc.retriable_value_error import RetriableValueError
+
+
+def chunk(a, chunk_size):
+    for i in range(0, len(a), chunk_size):
+        yield a[i:i + chunk_size]
 
 
 def hex_to_dec(hex_string):
@@ -71,10 +85,23 @@ def rpc_response_to_result(response):
             # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
             # synced node
             raise RetriableValueError(error_message)
+        elif response.get('error') is not None and is_skipable_error(response.get('error').get('code')):
+            logging.warning(error_message)
+            return None
         elif response.get('error') is not None and is_retriable_error(response.get('error').get('code')):
             raise RetriableValueError(error_message)
         raise ValueError(error_message)
     return result
+
+
+SKIPABLE_ERRORS = [
+    -32009,  # Slot {} was skipped, or missing in long-term storage
+]
+
+
+def is_skipable_error(error_code):
+    if error_code in SKIPABLE_ERRORS:
+        return True
 
 
 def is_retriable_error(error_code):
@@ -89,3 +116,32 @@ def is_retriable_error(error_code):
         return True
 
     return False
+
+
+@contextlib.contextmanager
+def get_item_iterable(input_file):
+    fh = get_file_handle(input_file, 'r')
+
+    if input_file.endswith('.csv'):
+        set_max_field_size_limit()
+        reader = csv.DictReader(fh)
+    else:
+        reader = (json.loads(line) for line in fh)
+
+    try:
+        yield reader
+    finally:
+        fh.close()
+
+
+def extract_field(input_file, output_file, field):
+    with get_item_iterable(input_file) as item_iterable, smart_open(output_file, 'w') as output:
+        for item in item_iterable:
+            output.write(item[field] + '\n')
+
+
+def safe_get(arr: List, index: int, default=None):
+    try:
+        return arr[index]
+    except:
+        return default
