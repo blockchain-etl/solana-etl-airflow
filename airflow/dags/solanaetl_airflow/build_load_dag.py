@@ -32,6 +32,7 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
     GCSToBigQueryOperator
 from google.cloud import bigquery
 from google.cloud.bigquery import TimePartitioning
+from airflow.operators.email import EmailOperator
 
 from solanaetl_airflow.utils.bigquery import submit_bigquery_job
 from solanaetl_airflow.utils.error_handling import handle_dag_failure
@@ -243,9 +244,9 @@ def build_load_dag(
                 open(local_path, mode='a').close()
                 upload_to_gcs(
                     gcs_hook=gcs_hook,
-                    bucket=checkpoint_bucket,
-                    object=remote_path,
-                    filename=local_path)
+                    bucket_name=checkpoint_bucket,
+                    object_name=remote_path,
+                    file_name=local_path)
 
         save_checkpoint_task = PythonOperator(
             task_id='save_checkpoint',
@@ -278,5 +279,26 @@ def build_load_dag(
         'accounts', dependencies=[load_transactions_task, load_accounts_task])
     enrich_nfts_task = add_enrich_tasks(
         'nfts', dependencies=[load_transactions_task, load_nfts_task])
+
+    save_checkpoint_task = add_save_checkpoint_tasks(dependencies=[
+        enrich_blocks_task,
+        enrich_transactions_task,
+        enrich_instructions_task,
+        enrich_token_transfers_task,
+        enrich_accounts_task,
+        enrich_nfts_task
+    ])
+
+    # Send email task #
+    if notification_emails and len(notification_emails) > 0:
+        send_email_task = EmailOperator(
+            task_id='send_email',
+            to=[email.strip() for email in notification_emails.split(',')],
+            subject='Solana ETL Airflow Load DAG Succeeded',
+            html_content='Solana ETL Airflow Load DAG Succeeded - {}'.format(
+                chain),
+            dag=dag
+        )
+        save_checkpoint_task >> send_email_task
 
     return dag
