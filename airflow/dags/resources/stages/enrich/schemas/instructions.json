@@ -32,7 +32,7 @@
     {
         "name": "accounts",
         "type": "STRING",
-        "mode": "NULLABLE"
+        "mode": "REPEATED"
     },
     {
         "name": "data",
@@ -61,7 +61,19 @@
     },
     {
         "name": "params",
-        "type": "STRING",
-        "mode": "NULLABLE"
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "key",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "value",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
     }
 ]

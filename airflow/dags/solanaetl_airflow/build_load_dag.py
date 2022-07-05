@@ -70,18 +70,6 @@ def build_load_dag(
         'load_all_partitions': load_all_partitions
     }
 
-    def read_bigquery_schema_from_file(filepath):
-        result = []
-        file_content = read_file(filepath)
-        json_content = json.loads(file_content)
-        for field in json_content:
-            result.append(bigquery.SchemaField(
-                name=field.get('name'),
-                field_type=field.get('type', 'STRING'),
-                mode=field.get('mode', 'NULLABLE'),
-                description=field.get('description')))
-        return result
-
     def read_file(file_path):
         with open(file_path) as f:
             content = f.read()
@@ -163,8 +151,9 @@ def build_load_dag(
 
             schema_path = os.path.join(
                 dags_folder, f'resources/stages/enrich/schemas/{task}.json')
-            schema = read_bigquery_schema_from_file(schema_path)
-            table = bigquery.Table(temp_table_ref, schema=schema)
+            # schema = read_bigquery_schema_from_file(schema_path)
+            table = bigquery.Table(
+                temp_table_ref, schema=json.loads(read_file((schema_path))))
 
             description_path = os.path.join(
                 dags_folder, f'resources/stages/enrich/descriptions/{task}.txt')
