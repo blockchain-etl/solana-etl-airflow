@@ -134,6 +134,9 @@ def build_load_dag(
         return load_operator
 
     def add_enrich_tasks(task, time_partitioning_field='block_timestamp', dependencies=None, always_load_all_partitions=False):
+        """
+        block_timestamp can be null, should not require to use Partition filter. Ex: block 1
+        """
         def enrich_task(ds, **kwargs):
             template_context = kwargs.copy()
             template_context['ds'] = ds

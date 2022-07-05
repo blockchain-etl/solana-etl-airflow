@@ -25,8 +25,8 @@ import pendulum
 from airflow import DAG, configuration
 from airflow.operators import python_operator
 from solanaetl.cli import export_blocks_and_transactions, extract_accounts
-from solanaetl.cli.extract_tokens import extract_tokens
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
+from solanaetl.cli.extract_tokens import extract_tokens
 
 from solanaetl_airflow.utils.error_handling import handle_dag_failure
 from solanaetl_airflow.utils.gcs import download_from_gcs, upload_to_gcs
@@ -48,13 +48,13 @@ def build_export_dag(
     **kwargs
 ):
     default_dag_args = {
-        "depends_on_past": False,
-        "start_date": pendulum.today(tz="UTC"),
-        "email_on_failure": True,
-        "email_on_retry": False,
-        "retries": export_retries,
-        "retry_delay": timedelta(minutes=5),
-        "on_failure_callback": handle_dag_failure,
+        'depends_on_past': False,
+        'start_date': pendulum.today(tz='UTC'),
+        'email_on_failure': True,
+        'email_on_retry': False,
+        'retries': export_retries,
+        'retry_delay': timedelta(minutes=5),
+        'on_failure_callback': handle_dag_failure,
     }
 
     if notification_emails and len(notification_emails) > 0:
@@ -82,7 +82,7 @@ def build_export_dag(
 
     # Export
     def export_path(directory, start_block, end_block):
-        return "export/{directory}/start_block={start_block}/end_block={end_block}/".format(
+        return 'export/{directory}/start_block={start_block}/end_block={end_block}/'.format(
             directory=directory, start_block=start_block, end_block=end_block
         )
 
@@ -119,98 +119,98 @@ def build_export_dag(
                 batch_size=export_block_batch_size,
                 provider_uri=provider_uri,
                 max_workers=export_max_workers,
-                blocks_output=os.path.join(tempdir, "blocks.csv"),
-                transactions_output=os.path.join(tempdir, "transactions.csv"),
-                instructions_output=os.path.join(tempdir, "instructions.csv")
+                blocks_output=os.path.join(tempdir, 'blocks.csv'),
+                transactions_output=os.path.join(tempdir, 'transactions.csv'),
+                instructions_output=os.path.join(tempdir, 'instructions.csv')
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "blocks.csv"),
-                export_path("blocks", export_start_block, export_end_block)
+                os.path.join(tempdir, 'blocks.csv'),
+                export_path('blocks', export_start_block, export_end_block)
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "transactions.csv"),
-                export_path("transactions", export_start_block,
+                os.path.join(tempdir, 'transactions.csv'),
+                export_path('transactions', export_start_block,
                             export_end_block)
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "instructions.csv"),
-                export_path("instructions", export_start_block,
+                os.path.join(tempdir, 'instructions.csv'),
+                export_path('instructions', export_start_block,
                             export_end_block)
             )
 
     def extract_accounts_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
             copy_from_export_path(
-                export_path("instructions", export_start_block,
+                export_path('instructions', export_start_block,
                             export_end_block),
-                os.path.join(tempdir, "instructions.csv")
+                os.path.join(tempdir, 'instructions.csv')
             )
 
             logging.info('Calling extract_accounts({}, {}, {}, {}, {}, ...)'.format(
                 export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
 
             extract_accounts.callback(
-                instructions=os.path.join(tempdir, "instructions.csv"),
+                instructions=os.path.join(tempdir, 'instructions.csv'),
                 batch_size=export_batch_size,
-                output=os.path.join(tempdir, "accounts.csv"),
+                output=os.path.join(tempdir, 'accounts.csv'),
                 max_workers=export_max_workers,
                 provider_uri=provider_uri
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "accounts.csv"),
-                export_path("accounts", export_start_block, export_end_block)
+                os.path.join(tempdir, 'accounts.csv'),
+                export_path('accounts', export_start_block, export_end_block)
             )
 
     def extract_token_transfers_command(**kwargs):
         with TemporaryDirectory() as tempdir:
             copy_from_export_path(
-                export_path("instructions", export_start_block,
+                export_path('instructions', export_start_block,
                             export_end_block),
-                os.path.join(tempdir, "instructions.csv")
+                os.path.join(tempdir, 'instructions.csv')
             )
 
             logging.info('Calling extract_token_transfers({}, {}, {}, {}, ...)'.format(
                 export_start_block, export_end_block, export_batch_size, export_max_workers))
 
             extract_token_transfers.callback(
-                instructions=os.path.join(tempdir, "instructions.csv"),
+                instructions=os.path.join(tempdir, 'instructions.csv'),
                 batch_size=export_batch_size,
-                output=os.path.join(tempdir, "token_transfers.csv"),
+                output=os.path.join(tempdir, 'token_transfers.csv'),
                 max_workers=export_max_workers,
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "token_transfers.csv"),
-                export_path("token_transfers",
+                os.path.join(tempdir, 'token_transfers.csv'),
+                export_path('token_transfers',
                             export_start_block, export_end_block)
             )
 
     def extract_tokens_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
             copy_from_export_path(
-                export_path("accounts", export_start_block,
+                export_path('accounts', export_start_block,
                             export_end_block),
-                os.path.join(tempdir, "accounts.csv")
+                os.path.join(tempdir, 'accounts.csv')
             )
 
             logging.info('Calling extract_tokens({}, {}, {}, {}, {}, ...)'.format(
                 export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
 
             extract_tokens.callback(
-                accounts=os.path.join(tempdir, "accounts.csv"),
+                accounts=os.path.join(tempdir, 'accounts.csv'),
                 batch_size=export_batch_size,
-                output=os.path.join(tempdir, "tokens.csv"),
+                output=os.path.join(tempdir, 'tokens.csv'),
                 max_workers=export_max_workers,
                 provider_uri=provider_uri
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "tokens.csv"),
-                export_path("tokens", export_start_block, export_end_block)
+                os.path.join(tempdir, 'tokens.csv'),
+                export_path('tokens', export_start_block, export_end_block)
             )
 
     def add_task(toggle, task_id, python_callable, dependencies=None):
@@ -234,14 +234,14 @@ def build_export_dag(
 
     export_blocks_and_transactions_operator = add_task(
         export_blocks_and_transactions_toggle,
-        "export_blocks_and_transactions",
+        'export_blocks_and_transactions',
         add_provider_uri_fallback_loop(
             export_blocks_and_transactions_command, provider_uris),
     )
 
     extract_accounts_operator = add_task(
         extract_accounts_toggle,
-        "extract_accounts",
+        'extract_accounts',
         add_provider_uri_fallback_loop(
             extract_accounts_command, provider_uris),
         dependencies=[export_blocks_and_transactions_operator]
@@ -249,14 +249,14 @@ def build_export_dag(
 
     extract_token_transfers_operator = add_task(
         extract_token_transfers_toggle,
-        "extract_token_transfers",
+        'extract_token_transfers',
         extract_token_transfers_command,
         dependencies=[export_blocks_and_transactions_operator]
     )
 
     extract_tokens_operator = add_task(
         extract_tokens_toggle,
-        "extract_tokens",
+        'extract_tokens',
         add_provider_uri_fallback_loop(
             extract_tokens_command, provider_uris),
         dependencies=[extract_accounts_operator]
