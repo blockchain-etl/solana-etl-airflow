@@ -85,6 +85,6 @@ Export tokens:
 ## Test
 
 ```bash
-> python -m pip install pytest
+> python -m pip install -r requirements_test.txt
 > python -m pytest
 ```

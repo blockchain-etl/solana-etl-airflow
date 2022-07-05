@@ -31,5 +31,6 @@
     "python.analysis.extraPaths": [
         "./cli",
         "./airflow/dags"
-    ]
+    ],
+    "python.formatting.provider": "autopep8"
 }
