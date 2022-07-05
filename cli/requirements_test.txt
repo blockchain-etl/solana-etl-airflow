@@ -1,0 +1,3 @@
+# These dependencies are shared by various tests: airflow/tests, cli/tests & tests
+
+pytest==7.1.2
