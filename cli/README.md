@@ -74,12 +74,12 @@ Export accounts:
 
 ---
 
-Export NFTs:
+Export tokens:
 
 ```bash
-> solanaetl extract_nfts \
+> solanaetl extract_tokens \
     -a ./accounts.csv \
-    -o nfts.csv
+    -o tokens.csv
 ```
 
 ## Test

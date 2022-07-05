@@ -24,8 +24,8 @@ from solanaetl.jobs.exporters.token_transfers_item_exporter import token_transfe
 from solanaetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 import tests.resources
 from blockchainetl_common.csv_utils import set_max_field_size_limit
-from solanaetl.jobs.exporters.nfts_item_exporter import nfts_item_exporter
-from solanaetl.jobs.extract_nfts_job import ExtractNftsJob
+from solanaetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
+from solanaetl.jobs.extract_tokens_job import ExtractTokensJob
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import (compare_lines_ignore_order, read_file,
                            skip_if_slow_tests_disabled)

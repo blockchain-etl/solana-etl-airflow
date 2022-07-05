@@ -23,9 +23,9 @@ import pytest
 from solanaetl.jobs.exporters.accounts_item_exporter import accounts_item_exporter
 import tests.resources
 from blockchainetl_common.csv_utils import set_max_field_size_limit
-from solanaetl.jobs.exporters.nfts_item_exporter import nfts_item_exporter
+from solanaetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from solanaetl.jobs.extract_accounts_job import ExtractAccountsJob
-from solanaetl.jobs.extract_nfts_job import ExtractNftsJob
+from solanaetl.jobs.extract_tokens_job import ExtractTokensJob
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import (compare_lines_ignore_order, read_file,
                            skip_if_slow_tests_disabled)
@@ -49,9 +49,9 @@ def test_extract_accounts(
 ):
     accounts_output_file = str(tmpdir.join('actual_accounts.csv'))
 
-    transactions_content = read_resource(resource_group, 'transactions.csv')
+    instructions_content = read_resource(resource_group, 'instructions.csv')
     set_max_field_size_limit()
-    transactions_csv_reader = csv.DictReader(io.StringIO(transactions_content))
+    instructions_csv_reader = csv.DictReader(io.StringIO(instructions_content))
 
     job = ExtractAccountsJob(
         batch_web3_provider=ThreadLocalProxy(
@@ -66,7 +66,7 @@ def test_extract_accounts(
         item_exporter=accounts_item_exporter(
             accounts_output=accounts_output_file,
         ),
-        instructions_iterable=transactions_csv_reader,
+        instructions_iterable=instructions_csv_reader,
     )
     job.run()
 

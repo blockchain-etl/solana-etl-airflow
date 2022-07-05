@@ -25,7 +25,7 @@ import pendulum
 from airflow import DAG, configuration
 from airflow.operators import python_operator
 from solanaetl.cli import export_blocks_and_transactions, extract_accounts
-from solanaetl.cli.extract_nfts import extract_nfts
+from solanaetl.cli.extract_tokens import extract_tokens
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 
 from solanaetl_airflow.utils.error_handling import handle_dag_failure
@@ -63,7 +63,7 @@ def build_export_dag(
     export_blocks_and_transactions_toggle = True
     extract_accounts_toggle = True
     extract_token_transfers_toggle = True
-    extract_nfts_toggle = True
+    extract_tokens_toggle = True
 
     if export_max_active_runs is None:
         export_max_active_runs = configuration.conf.getint(
@@ -188,7 +188,7 @@ def build_export_dag(
                             export_start_block, export_end_block)
             )
 
-    def extract_nfts_command(provider_uri, **kwargs):
+    def extract_tokens_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
             copy_from_export_path(
                 export_path("accounts", export_start_block,
@@ -196,20 +196,20 @@ def build_export_dag(
                 os.path.join(tempdir, "accounts.csv")
             )
 
-            logging.info('Calling extract_nfts({}, {}, {}, {}, {}, ...)'.format(
+            logging.info('Calling extract_tokens({}, {}, {}, {}, {}, ...)'.format(
                 export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
 
-            extract_nfts.callback(
+            extract_tokens.callback(
                 accounts=os.path.join(tempdir, "accounts.csv"),
                 batch_size=export_batch_size,
-                output=os.path.join(tempdir, "nfts.csv"),
+                output=os.path.join(tempdir, "tokens.csv"),
                 max_workers=export_max_workers,
                 provider_uri=provider_uri
             )
 
             copy_to_export_path(
-                os.path.join(tempdir, "nfts.csv"),
-                export_path("nfts", export_start_block, export_end_block)
+                os.path.join(tempdir, "tokens.csv"),
+                export_path("tokens", export_start_block, export_end_block)
             )
 
     def add_task(toggle, task_id, python_callable, dependencies=None):
@@ -253,11 +253,11 @@ def build_export_dag(
         dependencies=[export_blocks_and_transactions_operator]
     )
 
-    extract_nfts_operator = add_task(
-        extract_nfts_toggle,
-        "extract_nfts",
+    extract_tokens_operator = add_task(
+        extract_tokens_toggle,
+        "extract_tokens",
         add_provider_uri_fallback_loop(
-            extract_nfts_command, provider_uris),
+            extract_tokens_command, provider_uris),
         dependencies=[extract_accounts_operator]
     )
 

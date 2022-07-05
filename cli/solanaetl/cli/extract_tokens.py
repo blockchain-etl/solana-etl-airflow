@@ -16,8 +16,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import click
-from solanaetl.jobs.exporters.nfts_item_exporter import nfts_item_exporter
-from solanaetl.jobs.extract_nfts_job import ExtractNftsJob
+from solanaetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
+from solanaetl.jobs.extract_tokens_job import ExtractTokensJob
 from solanaetl.providers.auto import get_provider_from_uri
 from solanaetl.thread_local_proxy import ThreadLocalProxy
 from solanaetl.utils import get_item_iterable
@@ -31,15 +31,15 @@ from solanaetl.utils import get_item_iterable
 @click.option('-p', '--provider-uri', default='https://api.mainnet-beta.solana.com', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'https://api.mainnet-beta.solana.com')
-def extract_nfts(accounts: str, batch_size: int, output: str, max_workers: int, provider_uri: str):
-    """Extracts NFTs from accounts file."""
+def extract_tokens(accounts: str, batch_size: int, output: str, max_workers: int, provider_uri: str):
+    """Extracts Tokens from accounts file."""
     with get_item_iterable(accounts) as accounts_reader:
-        job = ExtractNftsJob(
+        job = ExtractTokensJob(
             batch_web3_provider=ThreadLocalProxy(
                 lambda: get_provider_from_uri(provider_uri, batch=True)),
             accounts_iterable=accounts_reader,
             batch_size=batch_size,
             max_workers=max_workers,
-            item_exporter=nfts_item_exporter(output))
+            item_exporter=tokens_item_exporter(output))
 
         job.run()

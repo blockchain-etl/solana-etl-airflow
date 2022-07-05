@@ -29,12 +29,12 @@ from solanaetl.domain.account import Account
 from solanaetl.executors.batch_work_executor import BatchWorkExecutor
 from solanaetl.json_rpc_requests import generate_get_multiple_accounts_json_rpc
 from solanaetl.mappers.account_mapper import AccountMapper
-from solanaetl.mappers.nft_mapper import NftMapper
+from solanaetl.mappers.token_mapper import TokenMapper
 from solanaetl.providers.batch import BatchProvider
 from solanaetl.utils import rpc_response_batch_to_results
 
 
-class ExtractNftsJob(BaseJob):
+class ExtractTokensJob(BaseJob):
     def __init__(
             self,
             batch_web3_provider: BatchProvider,
@@ -49,7 +49,7 @@ class ExtractNftsJob(BaseJob):
         self.item_exporter = item_exporter
 
         self.account_mapper = AccountMapper()
-        self.nft_mapper = NftMapper()
+        self.token_mapper = TokenMapper()
 
     def _start(self):
         self.item_exporter.open()
@@ -59,13 +59,13 @@ class ExtractNftsJob(BaseJob):
         accounts = [
             self.account_mapper.from_dict(account_dict)
             for account_dict in self.accounts_iterable
-            if account_dict.get('token_amount_decimals') == '0' and account_dict.get('account_type') == 'mint'
+            if account_dict.get('token_amount_decimals') is not None and account_dict.get('account_type') == 'mint'
         ]
 
         self.batch_work_executor.execute(
-            accounts, self._extract_nfts)
+            accounts, self._extract_tokens)
 
-    def _extract_nfts(self, accounts: List[Account]):
+    def _extract_tokens(self, accounts: List[Account]):
         metadata_accounts = [
             str(get_metadata_account(account.pubkey))
             for account in accounts
@@ -77,19 +77,22 @@ class ExtractNftsJob(BaseJob):
             json.dumps(rpc_requests))
         results = rpc_response_batch_to_results(response)
 
-        nfts = []
+        tokens = []
 
         for result in results:
             for idx, value in enumerate(result.get('value')):
                 if value is not None:
                     data = base64.b64decode(value.get('data')[0])
                     metadata = unpack_metadata_account(data)
-                    nfts.append(
-                        self.nft_mapper.from_metaplex_metadata(metadata, tx_signature=accounts[idx].tx_signature))
+                    tokens.append(
+                        self.token_mapper.from_metaplex_metadata(
+                            metadata,
+                            token_type='nft' if accounts[idx].token_amount_decimals == '0' else 'spl-token',
+                            tx_signature=accounts[idx].tx_signature))
 
-        for nft in nfts:
+        for token in tokens:
             self.item_exporter.export_item(
-                self.nft_mapper.to_dict(nft))
+                self.token_mapper.to_dict(token))
 
     def _end(self):
         self.batch_work_executor.shutdown()

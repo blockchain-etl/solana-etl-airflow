@@ -263,7 +263,7 @@ def build_load_dag(
     load_blocks_task = add_load_tasks('blocks', 'csv')
     load_transactions_task = add_load_tasks('transactions', 'csv')
     load_instructions_task = add_load_tasks('instructions', 'csv')
-    load_nfts_task = add_load_tasks('nfts', 'csv')
+    load_tokens_task = add_load_tasks('tokens', 'csv')
     load_token_transfers_task = add_load_tasks('token_transfers', 'csv')
     load_accounts_task = add_load_tasks('accounts', 'csv')
 
@@ -277,8 +277,8 @@ def build_load_dag(
         'token_transfers', dependencies=[load_transactions_task, load_token_transfers_task])
     enrich_accounts_task = add_enrich_tasks(
         'accounts', dependencies=[load_transactions_task, load_accounts_task])
-    enrich_nfts_task = add_enrich_tasks(
-        'nfts', dependencies=[load_transactions_task, load_nfts_task])
+    enrich_tokens_task = add_enrich_tasks(
+        'tokens', dependencies=[load_transactions_task, load_tokens_task])
 
     save_checkpoint_task = add_save_checkpoint_tasks(dependencies=[
         enrich_blocks_task,
@@ -286,7 +286,7 @@ def build_load_dag(
         enrich_instructions_task,
         enrich_token_transfers_task,
         enrich_accounts_task,
-        enrich_nfts_task
+        enrich_tokens_task
     ])
 
     # Send email task #

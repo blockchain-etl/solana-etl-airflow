@@ -1,0 +1,111 @@
+[
+    {
+        "jsonrpc": "2.0",
+        "result": {
+            "context": {
+                "apiVersion": "1.10.25",
+                "slot": 140286274
+            },
+            "value": [
+                {
+                    "data": {
+                        "parsed": {
+                            "info": {
+                                "isNative": false,
+                                "mint": "31ax1qwpdhdUTFeff7quPvLDxKWWzEDudMzRKCRhhbZ3",
+                                "owner": "F1sTunKhcPtcejUSGW9zrYsWu2HqptoC99JzAgJV5vzQ",
+                                "state": "initialized",
+                                "tokenAmount": {
+                                    "amount": "1",
+                                    "decimals": 0,
+                                    "uiAmount": 1.0,
+                                    "uiAmountString": "1"
+                                }
+                            },
+                            "type": "account"
+                        },
+                        "program": "spl-token",
+                        "space": 165
+                    },
+                    "executable": false,
+                    "lamports": 2039280,
+                    "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                    "rentEpoch": 324
+                },
+                {
+                    "data": {
+                        "parsed": {
+                            "info": {
+                                "decimals": 0,
+                                "freezeAuthority": null,
+                                "isInitialized": true,
+                                "mintAuthority": "2oRbrsCxpB4JE9rLLgyoDq2cuxgT2nuzk4UtPvubeHts",
+                                "supply": "1"
+                            },
+                            "type": "mint"
+                        },
+                        "program": "spl-token",
+                        "space": 82
+                    },
+                    "executable": false,
+                    "lamports": 1461600,
+                    "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                    "rentEpoch": 324
+                },
+                {
+                    "data": [
+                        "BfxJbDIe1OABAAAA",
+                        "base64"
+                    ],
+                    "executable": false,
+                    "lamports": 974400,
+                    "owner": "ArAA6CZC123yMJLUe4uisBEgvfuw2WEvex9iFmFCYiXv",
+                    "rentEpoch": 323
+                },
+                null,
+                null,
+                null,
+                {
+                    "data": {
+                        "parsed": {
+                            "info": {
+                                "closeAuthority": "agsWhfJ5PPGjmzMieWY8BR5o1XRVszUBQ5uFz4CtDiJ",
+                                "isNative": false,
+                                "mint": "kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6",
+                                "owner": "2VoKAQGyYXpiZuvGNLnE7SDq5LSx44V2RXcGQBQbaQ9C",
+                                "state": "initialized",
+                                "tokenAmount": {
+                                    "amount": "0",
+                                    "decimals": 5,
+                                    "uiAmount": 0.0,
+                                    "uiAmountString": "0"
+                                }
+                            },
+                            "type": "account"
+                        },
+                        "program": "spl-token",
+                        "space": 165
+                    },
+                    "executable": false,
+                    "lamports": 2039280,
+                    "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                    "rentEpoch": 324
+                },
+                null,
+                null,
+                null,
+                {
+                    "data": [
+                        "yKSZu3Y8yDPDGxjMPhSKClKTgYkg7frtqzkeSTNsC3TbZp0QRwNCS/fFKQEqyzCddJMn/UbplVzhPs8YXYRjyj6JtQGYXh1mCK/25BBZJGavm0hr5XZ58vaLQc3cMeAgkndKj2Ni7RMA7GAhAAAAAOmuVrG4JXM0wctsU85XlY1jII/BoOLP0+Pe9TAm8nLAAQAAAAAAAAD+AAAAAAAAAAA=",
+                        "base64"
+                    ],
+                    "executable": false,
+                    "lamports": 2011440,
+                    "owner": "M2mx93ekt1fmXSVkTrUL9xVFHkmME8HTUi5Cyc5aF7K",
+                    "rentEpoch": 323
+                }
+            ]
+        },
+        "id": 1
+    }
+]

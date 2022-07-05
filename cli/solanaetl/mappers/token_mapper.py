@@ -19,24 +19,25 @@
 import json
 from typing import Dict
 
-from solanaetl.domain.nft import Nft
+from solanaetl.domain.token import Token
 
 
-class NftMapper(object):
-    def from_metaplex_metadata(self, metadata: Dict, tx_signature: str = None) -> Nft:
-        nft = Nft()
-        nft.tx_signature = tx_signature
-        nft.mint = metadata.get('mint')
-        nft.update_authority = metadata.get('update_authority')
-        nft.name = metadata.get('data').get('name')
-        nft.symbol = metadata.get('data').get('symbol')
-        nft.uri = metadata.get('data').get('uri')
-        nft.seller_fee_basis_points = metadata.get(
+class TokenMapper(object):
+    def from_metaplex_metadata(self, metadata: Dict, token_type: str = None, tx_signature: str = None) -> Token:
+        token = Token()
+        token.tx_signature = tx_signature
+        token.token_type = token_type
+        token.mint = metadata.get('mint')
+        token.update_authority = metadata.get('update_authority')
+        token.name = metadata.get('data').get('name')
+        token.symbol = metadata.get('data').get('symbol')
+        token.uri = metadata.get('data').get('uri')
+        token.seller_fee_basis_points = metadata.get(
             'data').get('seller_fee_basis_points')
         creators = metadata.get('data').get('creators')
         verified = metadata.get('data').get('verified')
         share = metadata.get('data').get('share')
-        nft.creators = [
+        token.creators = [
             {
                 'address': creator.decode("utf-8"),
                 'verified': verified[idx],
@@ -44,22 +45,23 @@ class NftMapper(object):
             }
             for idx, creator in enumerate(creators)
         ]
-        nft.primary_sale_happened = metadata.get('primary_sale_happened')
-        nft.is_mutable = metadata.get('is_mutable')
+        token.primary_sale_happened = metadata.get('primary_sale_happened')
+        token.is_mutable = metadata.get('is_mutable')
 
-        return nft
+        return token
 
-    def to_dict(self, nft: Nft) -> Dict:
+    def to_dict(self, token: Token) -> Dict:
         return {
-            'type': 'nft',
-            'tx_signature': nft.tx_signature,
-            'mint': nft.mint,
-            'update_authority': nft.update_authority,
-            'name': nft.name,
-            'symbol': nft.symbol,
-            'uri': nft.uri,
-            'seller_fee_basis_points': nft.seller_fee_basis_points,
-            'creators': json.dumps(nft.creators),
-            'primary_sale_happened': nft.primary_sale_happened,
-            'is_mutable': nft.is_mutable,
+            'type': 'token',
+            'tx_signature': token.tx_signature,
+            'token_type': token.token_type,
+            'mint': token.mint,
+            'update_authority': token.update_authority,
+            'name': token.name,
+            'symbol': token.symbol,
+            'uri': token.uri,
+            'seller_fee_basis_points': token.seller_fee_basis_points,
+            'creators': json.dumps(token.creators),
+            'primary_sale_happened': token.primary_sale_happened,
+            'is_mutable': token.is_mutable,
         }

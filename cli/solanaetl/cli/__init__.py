@@ -20,11 +20,10 @@ from solanaetl.cli.export_all import export_all
 from solanaetl.cli.export_blocks_and_transactions import \
     export_blocks_and_transactions
 from solanaetl.cli.export_instructions import export_instructions
-from solanaetl.cli.export_tokens import export_tokens
 from solanaetl.cli.extract_accounts import extract_accounts
 from solanaetl.cli.extract_field import extract_field
-from solanaetl.cli.extract_nfts import extract_nfts
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
+from solanaetl.cli.extract_tokens import extract_tokens
 
 
 @click.group()
@@ -38,13 +37,12 @@ def cli(ctx):
 cli.add_command(export_all, "export_all")
 cli.add_command(export_blocks_and_transactions,
                 'export_blocks_and_transactions')
-cli.add_command(export_tokens, 'export_tokens')
 cli.add_command(export_instructions, 'export_instructions')
 
 # extract
 cli.add_command(extract_token_transfers, 'extract_token_transfers')
 cli.add_command(extract_accounts, 'extract_accounts')
-cli.add_command(extract_nfts, 'extract_nfts')
+cli.add_command(extract_tokens, 'extract_tokens')
 
 # utils
 cli.add_command(extract_field, 'extract_field')
