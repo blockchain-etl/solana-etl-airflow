@@ -1,0 +1,62 @@
+[
+    {
+        "name": "block_number",
+        "type": "INT64",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_timestamp",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "source",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "destination",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "authority",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "value",
+        "type": "NUMERIC",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "decimals",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mint",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mint_authority",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "transfer_type",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "tx_signature",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    }
+]

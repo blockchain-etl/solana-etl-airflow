@@ -1,0 +1,67 @@
+[
+    {
+        "name": "signature",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "previous_block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_number",
+        "type": "INT64",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_timestamp",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "fee",
+        "type": "NUMERIC",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "status",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "err",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "accounts",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "log_messages",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "balance_changes",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "pre_token_balances",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "post_token_balances",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    }
+]

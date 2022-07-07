@@ -1,0 +1,224 @@
+[
+    {
+        "name": "block_number",
+        "type": "INT64",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "block_timestamp",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "pubkey",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "tx_signature",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "executable",
+        "type": "BOOL",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "lamports",
+        "type": "NUMERIC",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "owner",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "rent_epoch",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "program",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "space",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "account_type",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "is_native",
+        "type": "BOOL",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mint",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "state",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "token_amount",
+        "type": "NUMERIC",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "token_amount_decimals",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "program_data",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "authorized_voters",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "authorized_voter",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "epoch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "authorized_withdrawer",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "prior_voters",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "authorized_pubkey",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "epoch_of_last_authorized_switch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "target_epoch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "node_pubkey",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "commission",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "epoch_credits",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "credits",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "epoch",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "previous_credits",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "votes",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "confirmation_count",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "slot",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "root_slot",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "last_timestamp",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+            {
+                "name": "slot",
+                "type": "INT64",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "timestamp",
+                "type": "TIMESTAMP",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "data",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+            {
+                "name": "raw",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "encoding",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
+    }
+]

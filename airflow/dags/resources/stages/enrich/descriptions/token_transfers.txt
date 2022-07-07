@@ -1,0 +1,2 @@
+This table contains the subset of those transactions and has further processed and denormalized the data to make it easier to consume for analysis of token transfer events.
+Data is exported using https://github.com/blockchain-etl/solana-etl
