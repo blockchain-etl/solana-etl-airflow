@@ -25,6 +25,6 @@ DAG = build_export_dag(
         var_prefix='solana_',
         export_schedule_interval='0 5 * * *',
         export_max_active_runs=1,
-        export_max_workers=1,
+        export_max_workers=5,
     )
 )

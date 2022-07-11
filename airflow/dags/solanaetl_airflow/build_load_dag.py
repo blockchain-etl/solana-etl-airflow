@@ -27,7 +27,7 @@ import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
-from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor
+from airflow.providers.google.cloud.sensors.gcs import GCSObjectsWithPrefixExistenceSensor
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
     GCSToBigQueryOperator
 from google.cloud import bigquery
@@ -103,12 +103,12 @@ def build_load_dag(
     gcs_hook = GCSHook()
 
     def add_load_tasks(task, file_format, allow_quoted_newlines=False):
-        wait_sensor = GCSObjectExistenceSensor(
+        wait_sensor = GCSObjectsWithPrefixExistenceSensor(
             task_id=f'wait_latest_{task}',
             timeout=12 * 60 * 60,
             poke_interval=60,
             bucket=output_bucket,
-            object=f'export/{task}/start_block={load_start_block}/end_block={load_end_block}/{task}.{file_format}',
+            prefix=f'export/{task}/',
             dag=dag
         )
 

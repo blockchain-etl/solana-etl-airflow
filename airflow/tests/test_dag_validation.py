@@ -73,4 +73,4 @@ def test_dag_ids(dag_bag):
         "solana_export_dag",
         "solana_load_dag",
     ]
-    assert sorted(dag_bag.dag_ids) == expected_dag_ids
+    assert sorted(dag_bag.dag_ids) == sorted(expected_dag_ids)
