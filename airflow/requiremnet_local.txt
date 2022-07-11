@@ -1,4 +1,4 @@
-apache-airflow==1.10.3
+apache-airflow==2.3.2
 discord-webhook==0.16.3
 google-cloud-bigquery==2.34.4
 google-cloud-storage==1.44.0
