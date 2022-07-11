@@ -1,0 +1,28 @@
+name: airflowTests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: solana-etl airflow tests
+    steps:
+      - uses: actions/setup-python@v3
+        with:
+          python-version: 3.7
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          pip install \
+            --upgrade pip \
+            -r requirements_test.txt \
+            -r airflow/requirements_local.txt \
+            -e cli \
+            -r airflow/requirements.txt
+      - name: Run pytest on airflow/tests
+        run: pytest -vv airflow

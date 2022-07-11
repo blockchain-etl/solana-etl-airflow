@@ -23,7 +23,7 @@ from tempfile import TemporaryDirectory
 
 import pendulum
 from airflow import DAG, configuration
-from airflow.operators import python_operator
+from airflow.operators.python import PythonOperator
 from solanaetl.cli import export_blocks_and_transactions, extract_accounts
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 from solanaetl.cli.extract_tokens import extract_tokens
@@ -215,10 +215,9 @@ def build_export_dag(
 
     def add_task(toggle, task_id, python_callable, dependencies=None):
         if toggle:
-            operator = python_operator.PythonOperator(
+            operator = PythonOperator(
                 task_id=task_id,
                 python_callable=python_callable,
-                provide_context=True,
                 execution_timeout=timedelta(hours=24),
                 dag=dag,
             )

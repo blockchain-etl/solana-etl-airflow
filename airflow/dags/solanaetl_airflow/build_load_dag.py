@@ -25,7 +25,7 @@ from tempfile import TemporaryDirectory
 
 import pendulum
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
@@ -229,7 +229,6 @@ def build_load_dag(
         enrich_operator = PythonOperator(
             task_id=f'enrich_{task}',
             python_callable=enrich_task,
-            provide_context=True,
             execution_timeout=timedelta(minutes=60),
             dag=dag
         )
@@ -254,7 +253,6 @@ def build_load_dag(
         save_checkpoint_task = PythonOperator(
             task_id='save_checkpoint',
             python_callable=save_checkpoint,
-            provide_context=True,
             execution_timeout=timedelta(hours=1),
             dag=dag,
         )
