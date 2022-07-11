@@ -45,8 +45,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
 
         start_time = time()
 
-        padded_batch_start_block = str(batch_start_block).zfill(8)
-        padded_batch_end_block = str(batch_end_block).zfill(8)
+        padded_batch_start_block = str(batch_start_block).zfill(16)
+        padded_batch_end_block = str(batch_end_block).zfill(16)
         block_range = '{padded_batch_start_block}-{padded_batch_end_block}'.format(
             padded_batch_start_block=padded_batch_start_block,
             padded_batch_end_block=padded_batch_end_block,
