@@ -17,8 +17,6 @@ jobs:
         python-version: 3.7
     - name: Build a binary wheel and a source tarball
       run: cd cli && python setup.py sdist
-    - name: Build package
-      run: python -m build
     - name: Publish distribution to Test PyPI
       if: startsWith(github.event.ref, 'refs/tags/v')
       uses: pypa/gh-action-pypi-publish@master
