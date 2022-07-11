@@ -1,0 +1,6 @@
+apache-airflow==2.3.2
+discord-webhook==0.16.3
+google-cloud-bigquery==2.34.4
+google-cloud-storage==1.44.0
+google-api-python-client==1.12.11
+apache-airflow-providers-google==8.1.0
