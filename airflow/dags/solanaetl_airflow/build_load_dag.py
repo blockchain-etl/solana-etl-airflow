@@ -30,6 +30,7 @@ from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
     GCSToBigQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCheckOperator
 from google.cloud import bigquery
 from google.cloud.bigquery import TimePartitioning
 from airflow.operators.email import EmailOperator
@@ -263,6 +264,20 @@ def build_load_dag(
                 dependency >> save_checkpoint_task
         return save_checkpoint_task
 
+    def add_verify_tasks(task, dependencies=None):
+        sql_path = os.path.join(dags_folder, 'resources/stages/verify/sqls/{task}.sql'.format(task=task))
+        sql = read_file(sql_path)
+        verify_task = BigQueryCheckOperator(
+            task_id='verify_{task}'.format(task=task),
+            bql=sql,
+            params=environment,
+            use_legacy_sql=False,
+            dag=dag)
+        if dependencies is not None and len(dependencies) > 0:
+            for dependency in dependencies:
+                dependency >> verify_task
+        return verify_task
+
     load_blocks_task = add_load_tasks('blocks', 'csv')
     load_transactions_task = add_load_tasks('transactions', 'csv')
     load_instructions_task = add_load_tasks('instructions', 'csv')
@@ -292,6 +307,9 @@ def build_load_dag(
         enrich_tokens_task
     ])
 
+    verify_blocks_count_task = add_verify_tasks('blocks_count', dependencies=[enrich_blocks_task])
+    verify_blocks_have_latest_task = add_verify_tasks('blocks_have_latest', dependencies=[enrich_blocks_task])
+
     # Send email task #
     if notification_emails and len(notification_emails) > 0:
         send_email_task = EmailOperator(
@@ -303,5 +321,7 @@ def build_load_dag(
             dag=dag
         )
         save_checkpoint_task >> send_email_task
+        verify_blocks_count_task >> send_email_task
+        verify_blocks_have_latest_task >> send_email_task
 
     return dag
