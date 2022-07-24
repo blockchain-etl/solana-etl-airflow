@@ -23,6 +23,8 @@ from solanaetl.cli.extract_accounts import extract_accounts
 from solanaetl.cli.extract_field import extract_field
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 from solanaetl.cli.extract_tokens import extract_tokens
+from solanaetl.cli.stream import stream
+
 
 
 @click.group()
@@ -44,3 +46,6 @@ cli.add_command(extract_tokens, "extract_tokens")
 
 # utils
 cli.add_command(extract_field, "extract_field")
+
+# streaming
+cli.add_command(stream, "stream")
