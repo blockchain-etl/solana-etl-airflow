@@ -36,7 +36,6 @@ setup(
     python_requires=">=3.6,<3.10",
     install_requires=[
         "base58",
-        "eth-hash==0.3.3",
         "blockchain-etl-common==1.6.1",
         "click==8.1.3",
         "web3==6.0.0b3",
