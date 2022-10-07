@@ -89,7 +89,7 @@ class ExportBlocksJob(BaseJob):
             json.dumps(blocks_rpc))
         results = rpc_response_batch_to_results(response)
         blocks = [self.block_mapper.from_json_dict(
-            result) for result in results]
+            result) for result in results if result is not None]
 
         for block in blocks:
             self._export_block(block)
