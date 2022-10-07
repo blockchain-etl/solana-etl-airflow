@@ -3,4 +3,4 @@
 # pip will then prioritise the local solana-etl package over pypi
 
 discord-webhook==0.16.3
-solana-etl==0.0.4
+solana-etl==0.0.5

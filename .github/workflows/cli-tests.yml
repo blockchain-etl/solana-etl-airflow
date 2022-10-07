@@ -8,7 +8,7 @@ on:
 
 env:
   # include "slow" tests that make node requests, as well as mocks
-  SOLANAETL_RUN_SLOW_TESTS: true
+  SOLANAETL_RUN_SLOW_TESTS: false
   SOLANAETL_PROVIDER_URI: https://api.mainnet-beta.solana.com
 
 jobs:
