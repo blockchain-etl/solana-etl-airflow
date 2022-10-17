@@ -1,5 +1,5 @@
 MERGE `{{params.destination_dataset_project_id}}.{{params.destination_dataset_name}}.token_transfers` dest
-USING {{params.dataset_name_temp}}.{{params.source_table}} source
+USING {{params.dataset_name_temp}}.{{params.source_table}} tbl_source
 ON FALSE
 WHEN NOT MATCHED AND DATE(block_timestamp) = '{{ds}}' THEN
 INSERT (
@@ -29,5 +29,5 @@ INSERT (
     transfer_type,
     tx_signature
 )
-WHEN NOT MATCHED BY source AND DATE(block_timestamp) = '{{ds}}' THEN
+WHEN NOT MATCHED BY tbl_source AND DATE(block_timestamp) = '{{ds}}' THEN
 DELETE

@@ -36,7 +36,7 @@ setup(
     install_requires=[
         "base58",
         "blockchain-etl-common==1.6.1",
-        "click==8.1.3",
+        "click>=7.0",
         "web3==6.0.0b3",
         "solana==0.25.1",
         "rlp==3.0.0",
