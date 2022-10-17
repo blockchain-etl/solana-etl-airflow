@@ -29,5 +29,5 @@ INSERT (
     transfer_type,
     tx_signature
 )
-WHEN NOT MATCHED BY tbl_source AND DATE(block_timestamp) = '{{ds}}' THEN
+WHEN NOT MATCHED BY source AND DATE(block_timestamp) = '{{ds}}' THEN
 DELETE
