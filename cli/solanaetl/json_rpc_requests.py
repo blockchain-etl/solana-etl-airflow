@@ -48,6 +48,12 @@ def generate_get_multiple_accounts_json_rpc(accounts, encoding='jsonParsed'):
             request_id=idx
         )
 
+def generate_get_latest_block_json_rpc(request_id=1):
+    return {
+        'jsonrpc': '2.0',
+        'method': "getBlockHeight",
+        'id': request_id,
+    }
 
 def generate_json_rpc(method, params, request_id=1):
     return {

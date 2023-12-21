@@ -60,7 +60,7 @@ class ExportInstructionsJob(BaseJob):
             json.dumps(transactions_rpc))
         results = rpc_response_batch_to_results(response)
         transactions = [self.transaction_mapper.from_json_dict(
-            result) for result in results]
+            result) for result in results if result is not None]
 
         for transaction in transactions:
             self._export_instructions_in_transaction(transaction)
