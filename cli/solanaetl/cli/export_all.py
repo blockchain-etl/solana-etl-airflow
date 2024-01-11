@@ -18,14 +18,9 @@
 import click
 from blockchainetl_common.logging_utils import logging_basic_config
 from solanaetl.jobs.export_all_common import export_all_common
+from solanaetl.utils import is_block_range
 
 logging_basic_config()
-
-
-def is_block_range(start, end):
-    """Checks for a valid block number."""
-    return (start.isdigit() and 0 <= int(start) <= 9999999999999999 and
-            end.isdigit() and 0 <= int(end) <= 9999999999999999)
 
 
 def get_partitions(start, end, partition_batch_size):

@@ -145,3 +145,9 @@ def safe_get(arr: List, index: int, default=None):
         return arr[index]
     except:
         return default
+
+
+def is_block_range(start, end):
+    """Checks for a valid block number."""
+    return ((not isinstance(start, str) or start.isdigit()) and 0 <= int(start) <= 9999999999999999 and
+            (not isinstance(end, str) or end.isdigit()) and 0 <= int(end) <= 9999999999999999)

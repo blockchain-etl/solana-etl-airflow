@@ -1,0 +1,31 @@
+name: cliTests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  # include "slow" tests that make node requests, as well as mocks
+  SOLANAETL_RUN_SLOW_TESTS: false
+  SOLANAETL_PROVIDER_URI: https://api.mainnet-beta.solana.com
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: solana-etl cli tests
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.7
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          pip install \
+            --upgrade pip \
+            -r requirements_test.txt \
+            -e cli
+      - name: Run pytest on cli/tests
+        run: pytest -vv -x cli

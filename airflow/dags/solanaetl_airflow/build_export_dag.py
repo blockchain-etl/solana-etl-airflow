@@ -23,10 +23,11 @@ from tempfile import TemporaryDirectory
 
 import pendulum
 from airflow import DAG, configuration
-from airflow.operators import python_operator
+from airflow.operators.python import PythonOperator
 from solanaetl.cli import export_blocks_and_transactions, extract_accounts
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 from solanaetl.cli.extract_tokens import extract_tokens
+from solanaetl.utils import is_block_range
 
 from solanaetl_airflow.utils.error_handling import handle_dag_failure
 from solanaetl_airflow.utils.gcs import download_from_gcs, upload_to_gcs
@@ -40,8 +41,8 @@ def build_export_dag(
     export_end_block,
     notification_emails=None,
     export_schedule_interval='0 0 * * *',
-    export_max_workers=1,
-    export_block_batch_size=1,
+    export_max_workers=5,
+    export_block_batch_size=500,
     export_batch_size=100,
     export_max_active_runs=None,
     export_retries=5,
@@ -80,15 +81,33 @@ def build_export_dag(
     from airflow.providers.google.cloud.hooks.gcs import GCSHook
     gcs_hook = GCSHook()
 
+    def get_partitions(start, end, partition_batch_size):
+        """Yield partitions based on input data type."""
+        if is_block_range(start, end):
+            start_block = int(start)
+            end_block = int(end)
+
+            for batch_start_block in range(start_block, end_block + 1, partition_batch_size):
+                batch_end_block = batch_start_block + partition_batch_size - 1
+                if batch_end_block > end_block:
+                    batch_end_block = end_block
+
+                yield batch_start_block, batch_end_block
+
+        else:
+            raise ValueError(
+                'start and end must be either block numbers')
+
+    partitions = get_partitions(
+        export_start_block, export_end_block, export_block_batch_size)
+
     # Export
     def export_path(directory, start_block, end_block):
-        return 'export/{directory}/start_block={start_block}/end_block={end_block}/'.format(
-            directory=directory, start_block=start_block, end_block=end_block
-        )
+        return f'export/{directory}/start_block={start_block}/end_block={end_block}/'
 
     def copy_to_export_path(file_path, export_path):
-        logging.info('Calling copy_to_export_path({}, {})'.format(
-            file_path, export_path))
+        logging.info(
+            f'Calling copy_to_export_path({file_path}, {export_path})')
         filename = os.path.basename(file_path)
 
         upload_to_gcs(
@@ -98,8 +117,8 @@ def build_export_dag(
             file_name=file_path)
 
     def copy_from_export_path(export_path, file_path):
-        logging.info('Calling copy_from_export_path({}, {})'.format(
-            export_path, file_path))
+        logging.info(
+            f'Calling copy_from_export_path({export_path}, {file_path})')
         filename = os.path.basename(file_path)
 
         download_from_gcs(
@@ -110,115 +129,120 @@ def build_export_dag(
 
     def export_blocks_and_transactions_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
-            logging.info('Calling export_blocks_and_transactions({}, {}, {}, {}, {}, ...)'.format(
-                export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
+            for batch_start_block, batch_end_block in partitions:
+                logging.info('Calling export_blocks_and_transactions({}, {}, {}, {}, {}, ...)'.format(
+                    batch_start_block, batch_end_block, export_batch_size, provider_uri, export_max_workers))
 
-            export_blocks_and_transactions.callback(
-                start_block=export_start_block,
-                end_block=export_end_block,
-                batch_size=export_block_batch_size,
-                provider_uri=provider_uri,
-                max_workers=export_max_workers,
-                blocks_output=os.path.join(tempdir, 'blocks.csv'),
-                transactions_output=os.path.join(tempdir, 'transactions.csv'),
-                instructions_output=os.path.join(tempdir, 'instructions.csv')
-            )
+                export_blocks_and_transactions.callback(
+                    start_block=batch_start_block,
+                    end_block=batch_end_block,
+                    batch_size=export_batch_size,
+                    provider_uri=provider_uri,
+                    max_workers=export_max_workers,
+                    blocks_output=os.path.join(tempdir, 'blocks.csv'),
+                    transactions_output=os.path.join(
+                        tempdir, 'transactions.csv'),
+                    instructions_output=os.path.join(
+                        tempdir, 'instructions.csv')
+                )
 
-            copy_to_export_path(
-                os.path.join(tempdir, 'blocks.csv'),
-                export_path('blocks', export_start_block, export_end_block)
-            )
+                copy_to_export_path(
+                    os.path.join(tempdir, 'blocks.csv'),
+                    export_path('blocks', batch_start_block, batch_end_block)
+                )
 
-            copy_to_export_path(
-                os.path.join(tempdir, 'transactions.csv'),
-                export_path('transactions', export_start_block,
-                            export_end_block)
-            )
+                copy_to_export_path(
+                    os.path.join(tempdir, 'transactions.csv'),
+                    export_path('transactions', batch_start_block,
+                                batch_end_block)
+                )
 
-            copy_to_export_path(
-                os.path.join(tempdir, 'instructions.csv'),
-                export_path('instructions', export_start_block,
-                            export_end_block)
-            )
+                copy_to_export_path(
+                    os.path.join(tempdir, 'instructions.csv'),
+                    export_path('instructions', batch_start_block,
+                                batch_end_block)
+                )
 
     def extract_accounts_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
-            copy_from_export_path(
-                export_path('instructions', export_start_block,
-                            export_end_block),
-                os.path.join(tempdir, 'instructions.csv')
-            )
+            for batch_start_block, batch_end_block in partitions:
+                copy_from_export_path(
+                    export_path('instructions', batch_start_block,
+                                batch_end_block),
+                    os.path.join(tempdir, 'instructions.csv')
+                )
 
-            logging.info('Calling extract_accounts({}, {}, {}, {}, {}, ...)'.format(
-                export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
+                logging.info('Calling extract_accounts({}, {}, {}, {}, {}, ...)'.format(
+                    batch_start_block, batch_end_block, export_batch_size, provider_uri, export_max_workers))
 
-            extract_accounts.callback(
-                instructions=os.path.join(tempdir, 'instructions.csv'),
-                batch_size=export_batch_size,
-                output=os.path.join(tempdir, 'accounts.csv'),
-                max_workers=export_max_workers,
-                provider_uri=provider_uri
-            )
+                extract_accounts.callback(
+                    instructions=os.path.join(tempdir, 'instructions.csv'),
+                    batch_size=export_batch_size,
+                    output=os.path.join(tempdir, 'accounts.csv'),
+                    max_workers=export_max_workers,
+                    provider_uri=provider_uri
+                )
 
-            copy_to_export_path(
-                os.path.join(tempdir, 'accounts.csv'),
-                export_path('accounts', export_start_block, export_end_block)
-            )
+                copy_to_export_path(
+                    os.path.join(tempdir, 'accounts.csv'),
+                    export_path('accounts', batch_start_block, batch_end_block)
+                )
 
     def extract_token_transfers_command(**kwargs):
         with TemporaryDirectory() as tempdir:
-            copy_from_export_path(
-                export_path('instructions', export_start_block,
-                            export_end_block),
-                os.path.join(tempdir, 'instructions.csv')
-            )
+            for batch_start_block, batch_end_block in partitions:
+                copy_from_export_path(
+                    export_path('instructions', batch_start_block,
+                                batch_end_block),
+                    os.path.join(tempdir, 'instructions.csv')
+                )
 
-            logging.info('Calling extract_token_transfers({}, {}, {}, {}, ...)'.format(
-                export_start_block, export_end_block, export_batch_size, export_max_workers))
+                logging.info('Calling extract_token_transfers({}, {}, {}, {}, ...)'.format(
+                    batch_start_block, batch_end_block, export_batch_size, export_max_workers))
 
-            extract_token_transfers.callback(
-                instructions=os.path.join(tempdir, 'instructions.csv'),
-                batch_size=export_batch_size,
-                output=os.path.join(tempdir, 'token_transfers.csv'),
-                max_workers=export_max_workers,
-            )
+                extract_token_transfers.callback(
+                    instructions=os.path.join(tempdir, 'instructions.csv'),
+                    batch_size=export_batch_size,
+                    output=os.path.join(tempdir, 'token_transfers.csv'),
+                    max_workers=export_max_workers,
+                )
 
-            copy_to_export_path(
-                os.path.join(tempdir, 'token_transfers.csv'),
-                export_path('token_transfers',
-                            export_start_block, export_end_block)
-            )
+                copy_to_export_path(
+                    os.path.join(tempdir, 'token_transfers.csv'),
+                    export_path('token_transfers',
+                                batch_start_block, batch_end_block)
+                )
 
     def extract_tokens_command(provider_uri, **kwargs):
         with TemporaryDirectory() as tempdir:
-            copy_from_export_path(
-                export_path('accounts', export_start_block,
-                            export_end_block),
-                os.path.join(tempdir, 'accounts.csv')
-            )
+            for batch_start_block, batch_end_block in partitions:
+                copy_from_export_path(
+                    export_path('accounts', batch_start_block,
+                                batch_end_block),
+                    os.path.join(tempdir, 'accounts.csv')
+                )
 
-            logging.info('Calling extract_tokens({}, {}, {}, {}, {}, ...)'.format(
-                export_start_block, export_end_block, export_batch_size, provider_uri, export_max_workers))
+                logging.info('Calling extract_tokens({}, {}, {}, {}, {}, ...)'.format(
+                    batch_start_block, batch_end_block, export_batch_size, provider_uri, export_max_workers))
 
-            extract_tokens.callback(
-                accounts=os.path.join(tempdir, 'accounts.csv'),
-                batch_size=export_batch_size,
-                output=os.path.join(tempdir, 'tokens.csv'),
-                max_workers=export_max_workers,
-                provider_uri=provider_uri
-            )
+                extract_tokens.callback(
+                    accounts=os.path.join(tempdir, 'accounts.csv'),
+                    batch_size=export_batch_size,
+                    output=os.path.join(tempdir, 'tokens.csv'),
+                    max_workers=export_max_workers,
+                    provider_uri=provider_uri
+                )
 
-            copy_to_export_path(
-                os.path.join(tempdir, 'tokens.csv'),
-                export_path('tokens', export_start_block, export_end_block)
-            )
+                copy_to_export_path(
+                    os.path.join(tempdir, 'tokens.csv'),
+                    export_path('tokens', batch_start_block, batch_end_block)
+                )
 
     def add_task(toggle, task_id, python_callable, dependencies=None):
         if toggle:
-            operator = python_operator.PythonOperator(
+            operator = PythonOperator(
                 task_id=task_id,
                 python_callable=python_callable,
-                provide_context=True,
                 execution_timeout=timedelta(hours=24),
                 dag=dag,
             )

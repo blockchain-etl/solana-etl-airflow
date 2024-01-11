@@ -1,5 +1,5 @@
 MERGE `{{params.destination_dataset_project_id}}.{{params.destination_dataset_name}}.token_transfers` dest
-USING {{params.dataset_name_temp}}.{{params.source_table}} source
+USING {{params.dataset_name_temp}}.{{params.source_table}} tbl_source
 ON FALSE
 WHEN NOT MATCHED AND DATE(block_timestamp) = '{{ds}}' THEN
 INSERT (
